@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>vlove</title>
+</head>
+<body>
+<wicket:extend>
+	<h2>Configuration</h2>
+	<div>
+	<form wicket:id="configForm">
+		<div>* all fields are required</div>
+		<label>address <span class="small">url for libvirt</span></label>
+		<input type="text" wicket:id="libvirtUrl" />
+		<button wicket:id="save" type="submit">save</button>
+		<div class="spacer"></div>
+	</form>
+	</div>
+</wicket:extend>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title>vlove</title>
+	<script type="text/javascript" src="js/jquery-1.4.min.js"></script>
+	<script type="text/javascript" src="js/vlove.js"></script>
+	<link rel="stylesheet" href="css/main.css" type="text/css" />
+</head>
+<body>
+<div id="busy_indicator">
+	<img src="images/ajax-loader.gif" align="top" alt=""/><span style="margin-left:5px; margin-top: 5px">Loading ...</span>
+</div>
+<div id="wrapper">
+	<div id="header">
+		<div id="logo">
+			<h1>vlove</h1>
+			<h2>vm console</h2>
+		</div>
+		<!-- end div#logo -->
+		<div id="menu">
+			<ul wicket:id="menu">
+				<li wicket:id="item"><a wicket:id="link"><wicket:container wicket:id="name" /></a></li>
+			</ul>
+		</div>
+		<!-- end div#menu -->
+	</div>
+	<!-- end div#header -->
+	<div id="page">
+		<div id="page-bgtop">
+			<div id="content">
+				<wicket:child />
+			</div>
+			<!-- end div#content -->
+			<div style="clear: both; height: 1px"></div>
+		</div>
+	</div>
+	<!-- end div#page -->
+</div>
+<!-- end div#wrapper -->
+<div id="footer">
+	<p id="legal">Copyright &copy; 2010 Limone Fresco Limited. All Rights Reserved.</p>
+	<p id="links"><a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a></p>
+</div>
+<!-- end div#footer -->
+</body>
+</html>
