@@ -1,12 +1,40 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd" xml:lang="en" lang="en">
 <head>
 	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
 	<title>vlove</title>
 </head>
 <body>
 <wicket:extend>
-vms here
+	<div wicket:id="container">
+	<table style="margin: 0px auto">
+		<thead>
+			<tr>
+				<th style="width:100px">name</th>
+				<th style="width:100px">id</th>
+				<th style="width:100px;text-align:center">status</th>
+				<th style="width:100px">cpu usage</th>
+				<th style="width:125px">memory usage</th>
+				<th style="width:120px">&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr wicket:id="repeater">
+				<td><wicket:container wicket:id="name" /></td>
+				<td><wicket:container wicket:id="domainId" /></td>
+				<td><img wicket:id="statusImage" alt="" />&nbsp;<wicket:container wicket:id="status" /></td>
+				<td><span wicket:id="cpuUsage" /></td>
+				<td><span wicket:id="memoryUsage" /></td>
+				<td style="text-align:center">
+					<a wicket:id="start"><img wicket:id="startImage" alt="" /></a>&nbsp;
+					<a wicket:id="pause"><img wicket:id="pauseImage" alt="" /></a>&nbsp;
+					<a wicket:id="stop"><img wicket:id="stopImage" alt="" /></a>&nbsp;
+					<a wicket:id="destroy"><img wicket:id="destroyImage" alt="" /></a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
 </wicket:extend>
 </body>
 </html>

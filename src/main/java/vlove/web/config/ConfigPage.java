@@ -13,6 +13,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 import vlove.dao.ConfigDao;
 import vlove.model.ConfigForm;
 import vlove.model.ConfigItem;
+import vlove.virt.VirtManager;
 import vlove.web.BasePage;
 import vlove.web.wicket.FormValidatorVisitor;
 import vlove.web.wicket.OutputMarkupIdAlwaysVisitor;
@@ -23,6 +24,9 @@ public class ConfigPage extends BasePage {
 	
 	@SpringBean
 	ConfigDao cd;
+	
+	@SpringBean
+	VirtManager vm;
 	
 	public ConfigPage() {
 		final ConfigForm configModel = new ConfigForm();
@@ -37,6 +41,8 @@ public class ConfigPage extends BasePage {
 				log.debug("Setting libvirt URL to: {}", configModel.getLibvirtUrl());
 				ci.setValue(configModel.getLibvirtUrl());
 				cd.saveConfigItem(ci);
+				
+				vm.connect(true);
 			}
 
 			@Override

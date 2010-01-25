@@ -19,7 +19,7 @@ public class WicketApplication extends WebApplication {
 	
 	@Override
 	protected void init() {
-		log.info("Limone coming alive.");
+		log.info("vlove coming alive.");
 		super.init();
 		
 		addComponentInstantiationListener(new SpringComponentInjector(this));

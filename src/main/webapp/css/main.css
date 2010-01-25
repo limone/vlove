@@ -257,3 +257,12 @@ a:hover {
 #content input.valid {
 	border: 1px solid #aacfe4;
 }
+
+img {
+	vertical-align: middle;
+	border: none;	
+}
+
+tr {
+	padding: 5px;
+}

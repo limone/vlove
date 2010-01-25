@@ -5,7 +5,18 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>vlove</name>
-	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<repositories>
 		<repository>
 			<id>central</id>
@@ -19,13 +30,15 @@
 			<id>java.net</id>
 			<url>http://download.java.net/maven/2/</url>
 		</repository>
+		<repository>
+			<id>wicketstuff</id>
+			<url>http://wicketstuff.org/maven/repository/</url>
+		</repository>
 	</repositories>
-	
 	<properties>
 		<spring.version>3.0.0.RELEASE</spring.version>
 		<wicket.version>1.4.5</wicket.version>
 	</properties>
-	
 	<dependencies>
 		<!-- libvirt -->
 		<dependency>
@@ -33,14 +46,14 @@
 			<artifactId>libvirt</artifactId>
 			<version>0.4.0</version>
 		</dependency>
-		
+
 		<!-- jna -->
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
 			<version>3.2.4</version>
 		</dependency>
-		
+
 		<!-- spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -87,7 +100,7 @@
 			<artifactId>spring-web</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
+
 		<!-- hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -119,7 +132,7 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>3.4.0.GA</version>
 		</dependency>
-		
+
 		<!--  wicket -->
 		<dependency>
 			<groupId>org.apache.wicket</groupId>
@@ -142,7 +155,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- aspectj -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -154,28 +167,28 @@
 			<artifactId>aspectjrt</artifactId>
 			<version>1.6.8</version>
 		</dependency>
-		
+
 		<!-- c3p0 -->
 		<dependency>
 			<groupId>c3p0</groupId>
 			<artifactId>c3p0</artifactId>
 			<version>0.9.1.2</version>
 		</dependency>
-		
+
 		<!-- embedded db -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<version>1.2.127</version>
 		</dependency>
-		
+
 		<!-- logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.5.8</version>
 		</dependency>
-	
+
 		<!-- special sauce -->
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
