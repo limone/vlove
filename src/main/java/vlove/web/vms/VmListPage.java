@@ -46,12 +46,12 @@ public class VmListPage extends BasePage {
 			@Override
 			protected void populateItem(ListItem<InternalDomain> item) {
 				final InternalDomain d = item.getModelObject();
-				final Integer domainId = d.getId();
-				final String domainName = d.getName();
+				final Integer domainId = d.getDomainId();
+				final String domainName = d.getDomainName();
 				final DomainState s = d.getState();
 
 				item.add(new Label("name", domainName));
-				item.add(new Label("domainId", Integer.toString(d.getId())));
+				item.add(new Label("domainId", Integer.toString(d.getDomainId())));
 
 				final Pair<String, String> domainState = domainState(d.getState());
 				item.add(domainState._2 == null ? new WebMarkupContainer("statusImage").setVisible(false) : new Image("statusImage", new ContextRelativeResource(domainState._2)));
@@ -139,12 +139,12 @@ public class VmListPage extends BasePage {
 								target.addComponent(destroy);
 
 								previousCpuUsage = currentCpuUsage;
-								currentCpuUsage = tmpDomain.getCpuUsage();
+								currentCpuUsage = tmpDomain.getCpuTime();
 								cpuUsage.setDefaultModelObject(usage.format((currentCpuUsage - previousCpuUsage) / (5 * Runtime.getRuntime().availableProcessors() * 10e9)));
 								target.addComponent(cpuUsage);
 
 								currentMemoryUsage = tmpDomain.getMemoryUsage() >> 10;
-								final double maxMemInMegs = d.getMaxMemory() >> 10 >> 10;
+								final double maxMemInMegs = d.getTotalMemory() >> 10 >> 10;
 								final double usedMem = currentMemoryUsage / maxMemInMegs;
 								memoryUsage.setDefaultModelObject(usage.format(usedMem));
 							}
@@ -157,15 +157,15 @@ public class VmListPage extends BasePage {
 	}
 	
 	private class ReloadableModel extends ListModel<InternalDomain> {
-		private final VirtManager vm;
+		private final VirtManager virtMgr;
 		
 		public ReloadableModel(VirtManager vm) {
-			this.vm = vm;
+			this.virtMgr = vm;
 			setObject(vm.getDomains());
 		}
 		
 		public void reload() {
-			setObject(vm.getDomains());
+			setObject(virtMgr.getDomains());
 		}
 	}
 }
