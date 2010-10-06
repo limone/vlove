@@ -20,7 +20,7 @@ import vlove.web.wicket.OutputMarkupIdAlwaysVisitor;
 
 @MountPath(path="/config")
 public class ConfigPage extends BasePage {
-	private static final Logger log = LoggerFactory.getLogger(ConfigPage.class);
+	transient final Logger log = LoggerFactory.getLogger(getClass());
 	
 	@SpringBean
 	ConfigDao cd;

@@ -36,26 +36,12 @@
 		<listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
 	</listener>
 	<listener>
-		<listener-class>vlove.web.listener.ShutdownListener</listener-class>
-	</listener>
-	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
 	<session-config>
 		<session-timeout>15</session-timeout>
 	</session-config>
-
-	<servlet>
-		<servlet-name>H2Console</servlet-name>
-		<servlet-class>org.h2.server.web.WebServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>H2Console</servlet-name>
-		<url-pattern>/console/*</url-pattern>
-	</servlet-mapping>
-
 
 	<!-- Default page to serve -->
 	<welcome-file-list>

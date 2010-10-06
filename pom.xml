@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>limone</groupId>
 	<artifactId>vlove</artifactId>
@@ -14,6 +15,19 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.zeroturnaround</groupId>
+				<artifactId>javarebel-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-rebel-xml</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -34,24 +48,28 @@
 			<id>wicketstuff</id>
 			<url>http://wicketstuff.org/maven/repository/</url>
 		</repository>
+		<repository>
+			<id>sonatype</id>
+			<url>https://oss.sonatype.org/content/groups/public/</url>
+		</repository>
 	</repositories>
 	<properties>
-		<spring.version>3.0.0.RELEASE</spring.version>
-		<wicket.version>1.4.5</wicket.version>
+		<spring.version>3.0.4.RELEASE</spring.version>
+		<wicket.version>1.4.12</wicket.version>
 	</properties>
 	<dependencies>
 		<!-- libvirt -->
 		<dependency>
 			<groupId>org.libvirt</groupId>
 			<artifactId>libvirt</artifactId>
-			<version>0.4.0</version>
+			<version>0.4.6</version>
 		</dependency>
 
 		<!-- jna -->
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-			<version>3.2.4</version>
+			<version>3.2.7</version>
 		</dependency>
 
 		<!-- spring -->
@@ -146,8 +164,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.wicketstuff</groupId>
-			<artifactId>wicketstuff-annotation</artifactId>
-			<version>1.1</version>
+			<artifactId>annotation</artifactId>
+			<version>${wicket.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -160,12 +178,12 @@
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjtools</artifactId>
-			<version>1.6.8</version>
+			<version>1.6.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
-			<version>1.6.8</version>
+			<version>1.6.9</version>
 		</dependency>
 
 		<!-- c3p0 -->
@@ -175,18 +193,23 @@
 			<version>0.9.1.2</version>
 		</dependency>
 
-		<!-- embedded db -->
+		<!--  db -->
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>1.2.127</version>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>8.4-701.jdbc4</version>
 		</dependency>
 
 		<!-- logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.5.8</version>
+			<version>1.6.1</version>
 		</dependency>
 
 		<!-- special sauce -->
@@ -195,6 +218,14 @@
 			<artifactId>geronimo-servlet_2.5_spec</artifactId>
 			<version>1.2</version>
 			<scope>provided</scope>
+		</dependency>
+		
+		<!-- testing -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

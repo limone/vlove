@@ -1,3 +1,0 @@
-<Context reloadable="true" crossContext="false">
-	<Resource name="jdbc/embedded" auth="Container" type="javax.sql.DataSource" maxActive="100" maxIdle="30" maxWait="10000" driverClassName="org.h2.Driver" url="jdbc:h2:vlove" username="sa" password="" removeAbandoned="true" removeAbandonedTimeout="60" logAbandoned="true" />
-</Context>

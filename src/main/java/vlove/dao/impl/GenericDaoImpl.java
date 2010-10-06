@@ -28,18 +28,22 @@ public class GenericDaoImpl implements GenericDao {
 		}
 	}
 
+	@Override
 	public <T> T find(Class<T> entityClass, Object identifier) {
 		return em.find(entityClass, identifier);
 	}
 
+	@Override
 	public <T> T merge(T entity) {
 		return em.merge(entity);
 	}
+	@Override
 	public <T> T persist(T entity) {
 		em.persist(entity);
 		return entity;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> query(String query, Map<String, Object> parameters) {
 		Query q = em.createQuery(query);
@@ -47,12 +51,14 @@ public class GenericDaoImpl implements GenericDao {
 		return q.getResultList();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> query(String query, Map<String, Object> parameters, int firstResult, int maxResults) {
 		Query q = em.createQuery(query).setFirstResult(firstResult).setMaxResults(maxResults);
 		applyParameters(q, parameters);
 		return q.getResultList();
 	}
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> namedQuery(String query, Map<String, Object> parameters) {
 		Query q = em.createNamedQuery(query);
@@ -60,6 +66,7 @@ public class GenericDaoImpl implements GenericDao {
 		return q.getResultList();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> namedQuery(String query, Map<String, Object> parameters, int firstResult, int maxResults) {
 		Query q = em.createNamedQuery(query).setFirstResult(firstResult).setMaxResults(maxResults);
@@ -67,6 +74,7 @@ public class GenericDaoImpl implements GenericDao {
 		return q.getResultList();
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T namedQuerySingle(String query, Map<String, Object> parameters) {
 		Query q = em.createNamedQuery(query);
@@ -78,6 +86,7 @@ public class GenericDaoImpl implements GenericDao {
 		}
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T querySingle(String query, Map<String, Object> parameters) {
 		Query q = em.createQuery(query);
@@ -85,16 +94,19 @@ public class GenericDaoImpl implements GenericDao {
 		return (T)q.getSingleResult();
 	}
 
+	@Override
 	public void remove(Object entity) {
 		if (em.contains(entity)) {
 			em.remove(entity);
 		}
 	}
 	
+	@Override
 	public void refresh(Object entity) {
 		em.refresh(entity);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> nativeQuery(String query, Map<String, Object> parameters, Integer maxResults) {
 		Query q = em.createNativeQuery(query);

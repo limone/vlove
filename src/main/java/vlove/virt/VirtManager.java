@@ -1,5 +1,6 @@
 package vlove.virt;
 
+import java.io.File;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.libvirt.Connect;
 import org.libvirt.Domain;
@@ -16,16 +18,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sun.management.OperatingSystemMXBean;
-
 import vlove.dao.ConfigDao;
 import vlove.model.InternalDomain;
 import vlove.model.Pair;
+
+import com.sun.management.OperatingSystemMXBean;
 
 @Service
 public class VirtManager implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(VirtManager.class);
 	
+	@Autowired
 	private ConfigDao cd;
 	
 	// Connection information
@@ -39,11 +42,6 @@ public class VirtManager implements Serializable {
 		// empty, for Spring
 	}
 	
-	@Autowired
-	public VirtManager(ConfigDao cd) {
-		this.cd = cd;
-	}
-	
 	@PostConstruct
 	public void init() {
 		final String os = System.getProperty("os.name");
@@ -55,15 +53,28 @@ public class VirtManager implements Serializable {
 				System.load(resource.toString());
 				connect();
 			} else {
-				log.warn("Could not load libvirt.dll.");
+				throw new RuntimeException("Could not load libvirt.dll.");
 			}
 		} else if (os != null && os.toLowerCase().contains("linux")) {
 			final String driver = "/usr/lib/libvirt.so.0";
-			System.load(driver);
-			connect();
+			if (new File(driver).exists()) {
+				System.load(driver);
+			} else {
+				throw new RuntimeException("Could not load /usr/lib/libvirt.so.0.");
+			}
 		}
 		
 		libvirtUrl = cd.getConfigItem("libvirt.url").getValue();
+		if (libvirtUrl == null || libvirtUrl.length() == 0) {
+			throw new RuntimeException("Could not retrieve libvirt URL.");
+		}
+		
+		connect();
+	}
+	
+	@PreDestroy
+	public void shutdown() {
+		disconnect();
 	}
 	
 	public boolean connect(boolean restart) {
@@ -82,6 +93,15 @@ public class VirtManager implements Serializable {
 		} catch (LibvirtException le) {
 			log.error("Could not connect to libvirt.", le);
 			return false;
+		}
+	}
+	
+	public void disconnect() {
+		try {
+			log.debug("Disconnecting from libvirt.");
+			connection.close();
+		} catch (LibvirtException le) {
+			log.warn("Could not close connection to libvirt.", le);
 		}
 	}
 	

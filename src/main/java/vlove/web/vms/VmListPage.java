@@ -28,12 +28,12 @@ import static vlove.model.TypeConverter.domainState;
 
 @MountPath(path = "/vms/list")
 public class VmListPage extends BasePage {
-	private static final Logger log = LoggerFactory.getLogger(VmListPage.class);
+	transient final Logger log = LoggerFactory.getLogger(getClass());
 
 	@SpringBean
-	private VirtManager vm;
+	VirtManager vm;
 
-	private final DecimalFormat usage = new DecimalFormat("##0.00%");
+	final DecimalFormat usage = new DecimalFormat("##0.00%");
 
 	public VmListPage() {
 		super();

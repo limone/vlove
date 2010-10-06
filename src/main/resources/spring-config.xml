@@ -10,8 +10,7 @@
 	<bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
 		<property name="locations">
 			<list>
-				<value>file:///${user.home}/limone.properties</value>
-				<value>${config}/limone.properties</value>
+				<value>classpath:vlove.properties</value>
 			</list>
 		</property>
 		<property name="ignoreResourceNotFound" value="true" />
