@@ -3,6 +3,7 @@ package vlove.virt;
 import java.io.File;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +49,14 @@ public class VirtManager implements Serializable {
 		log.debug("Loading driver for OS: {}", os);
 		
 		if (os != null && os.toLowerCase().contains("windows")) {
-			final URL resource = getClass().getResource("/lib/libvirt.dll");
+			final URL resource = getClass().getResource("/libvirt-0.dll");
 			if (resource != null) {
-				System.load(resource.toString());
-				connect();
+				try {
+					System.load(resource.toURI().getPath());
+				} catch (URISyntaxException use) {
+					log.warn("Could not parse URI path for libvirt.dll.");
+					throw new RuntimeException("Could not parse URI path for libvirt.dll.");
+				}
 			} else {
 				throw new RuntimeException("Could not load libvirt.dll.");
 			}
@@ -63,13 +68,6 @@ public class VirtManager implements Serializable {
 				throw new RuntimeException("Could not load /usr/lib/libvirt.so.0.");
 			}
 		}
-		
-		libvirtUrl = cd.getConfigItem("libvirt.url").getValue();
-		if (libvirtUrl == null || libvirtUrl.length() == 0) {
-			throw new RuntimeException("Could not retrieve libvirt URL.");
-		}
-		
-		connect();
 	}
 	
 	@PreDestroy
