@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="step1title">Step 1 - Basic Information</entry>
+	<entry key="step2title">Step 2 - Processor/Memory/Disk</entry>
+	<entry key="step3title">Step 3 - Networking</entry>
+</properties>

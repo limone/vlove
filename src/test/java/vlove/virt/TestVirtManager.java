@@ -1,16 +1,25 @@
 package vlove.virt;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import vlove.VirtException;
+import vlove.model.InternalDomain;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/spring-config.xml")
 public class TestVirtManager {
+	private transient final Logger log = LoggerFactory.getLogger(getClass());
+	
 	@Autowired
 	private VirtManager vm;
 	
@@ -18,29 +27,27 @@ public class TestVirtManager {
 	public void testVirtManager() {
 		assertNotNull(vm);
 	}
-
-	/*@Test
-	public void testVirtManagerConfigDao() {
-		fail("Not yet implemented");
-	}
-
+	
 	@Test
 	public void testInit() {
-		fail("Not yet implemented");
+		vm.init("qemu+unix:///system");
 	}
-
-	@Test
-	public void testConnectBoolean() {
-		fail("Not yet implemented");
-	}
-
+	
 	@Test
 	public void testConnect() {
-		fail("Not yet implemented");
+		vm.connect();
 	}
-
+	
 	@Test
 	public void testGetDomains() {
-		fail("Not yet implemented");
-	}*/
+		List<InternalDomain> domains = vm.getDomains();
+		for (InternalDomain domain : domains) {
+			log.debug("Domain: {}", domain.getDomainName());
+		}
+	}
+	
+	@Test
+	public void testGetCapabilities() throws VirtException {
+		assertNotNull(vm.getCapabilities());
+	}
 }

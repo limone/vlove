@@ -27,10 +27,6 @@ body {
 	top: 0;
 }
 
-#busy_indicator span {
-	
-}
-
 p,h1,form,button {
 	border: 0;
 	margin: 0;
@@ -47,8 +43,8 @@ h1,h2,h3 {
 }
 
 p,blockquote,ul,ol {
-	margin-bottom: 20px;
-	line-height: 2em;
+	margin-bottom: 15px;
+	line-height: 1.1em;
 }
 
 ul,ol,li {
@@ -165,7 +161,7 @@ a:hover {
 /* Forms */
 #content form {
 	margin: 0 auto;
-	width: 400px;
+	width: 606px;
 	padding: 14px;
 	border: solid 1px #d7dfe2;
 	background: #e6ebee
@@ -177,11 +173,11 @@ a:hover {
 	margin-bottom: 8px;
 }
 
-#content p {
-	font-size: 11px;
-	margin-bottom: 20px;
-	border-bottom: solid 1px #b7ddf2;
-	padding-bottom: 10px;
+#content h3, .wicketExtensionsWizardHeaderTitle {
+	font-size: 12px;
+	font-weight: bold;
+	margin-bottom: 8px;
+	color: #AA2808;
 }
 
 #content label {
@@ -201,7 +197,7 @@ a:hover {
 	width: 140px;
 }
 
-#content input {
+#content input, #content select {
 	float: left;
 	font-size: 12px;
 	padding: 4px 2px;
@@ -265,4 +261,45 @@ img {
 
 tr {
 	padding: 5px;
+}
+
+.calloutContainer {
+	padding: 5px;
+	position:absolute;
+	text-align: left;
+	width: 200px;
+	background-color: #E6EBEE;
+	border: 1px solid #EF8116;
+}
+
+.wicketExtensionsWizardHeader, .wicketExtensionsWizardInnerTable, .wicketExtensionsWizardView {
+	border: none !important;
+}
+
+.wicketExtensionsWizardButtonBar {
+	text-align: center !important;
+}
+
+.wicketExtensionsWizardButtonBar input[disabled] {
+	color: grey !important;
+}
+
+.wicketExtensionsWizardButtonBar input {
+	width: 80px !important;
+}
+
+.wizard-slider {
+	margin: -10px 0 10px 150px;
+	width: 205px;
+}
+
+input[disabled] {
+	color: #AA2808;
+}
+
+.ui-slider-handle {
+	background:url("images/ui-bg_glass_75_aa2808_1x400.png") repeat-x scroll 50% 50% #EF8116 !important;
+	border:1px solid #D3D3D3;
+	color:#555555;
+	font-weight:normal;
 }

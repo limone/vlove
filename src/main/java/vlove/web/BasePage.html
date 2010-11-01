@@ -3,14 +3,17 @@
 <head>
 	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
 	<title>vlove</title>
-	<script type="text/javascript" src="js/jquery-1.4.min.js"></script>
+	<script type="text/javascript" src="js/jquery-1.4.3.min.js"></script>
+	<script type="text/javascript" src="js/jquery-ui-1.8.5.custom.min.js"></script>
 	<script type="text/javascript" src="js/vlove.js"></script>
 	<link rel="stylesheet" href="css/main.css" type="text/css" />
+	<link type="text/css" href="css/vlove/jquery-ui-1.8.5.custom.css" rel="stylesheet" />
 </head>
 <body>
 <div id="busy_indicator">
 	<img src="images/ajax-loader.gif" alt=""/><span style="margin-left:5px; margin-top: 5px">Loading ...</span>
 </div>
+<div wicket:id="config"></div>
 <div id="wrapper">
 	<div id="header">
 		<div id="logo">
@@ -43,5 +46,17 @@
 	<p id="links"><a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a></p>
 </div>
 <!-- end div#footer -->
+
+<wicket:fragment wicket:id="missingConfig">
+	<div id='config'>
+		<div style="margin-bottom:15px">Looks like your configuration is incomplete!</div>
+		<div><a wicket:id="configPageLink">Click here</a> to visit the configuration page to fix this.</div>
+	</div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#config").dialog({modal:true, title:'Configuration Issue Detected!', width:350, height:100});
+		});
+	</script>
+</wicket:fragment>
 </body>
 </html>

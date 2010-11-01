@@ -1,5 +1,7 @@
 package vlove.web.config;
 
+import java.io.File;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.form.Form;
@@ -33,14 +35,46 @@ public class ConfigPage extends BasePage {
 		final ConfigItem ci = cd.getConfigItem("libvirt.url");
 		configModel.setLibvirtUrl(ci.getValue());
 		
+		final ConfigItem vl = cd.getConfigItem("vmbuilder.location");
+		configModel.setVmbuilderLocation(vl.getValue());
+		
 		Form<ConfigForm> configForm = new Form<ConfigForm>("configForm", new CompoundPropertyModel<ConfigForm>(configModel));
 		configForm.add(new RequiredTextField<String>("libvirtUrl"));
+		final RequiredTextField<String> vmBuilderField = new RequiredTextField<String>("vmbuilderLocation");
+		configForm.add(vmBuilderField);
 		configForm.add(new AjaxButton("save", configForm) {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> nestedForm) {
 				log.debug("Setting libvirt URL to: {}", configModel.getLibvirtUrl());
 				ci.setValue(configModel.getLibvirtUrl());
 				cd.saveConfigItem(ci);
+				
+				final String vmbuilderLocation = configModel.getVmbuilderLocation();
+				log.debug("Setting vmbuilder path to: {}", vmbuilderLocation);
+				final File vmbuilder = new File(vmbuilderLocation, "vmbuilder");
+				if (!vmbuilder.exists()) {
+					// Error, doesn't exist
+					log.warn("Could not find vmbuilder at the specified path.");
+					target.appendJavascript(String.format("inputRequired('%s', 'We could not find vmbuilder at the specified path.');", vmBuilderField.getId()));
+					return;
+				}
+				
+				if (!vmbuilder.isFile()) {
+					// It isn't a file?!
+					log.warn("vmbuilder exists, but apparently it isn't a file.  Whoah?");
+					target.appendJavascript(String.format("inputRequired('%s', 'vmbuilder exists, but apparently it isn't a file.  Whoah?');", vmBuilderField.getId()));
+					return;
+				}
+				
+				if (!vmbuilder.canExecute()) {
+					// We can't run it
+					log.warn("vmbuilder exists and is a file, we just cannot execute it.  Weak.");
+					target.appendJavascript(String.format("inputRequired('%s', 'vmbuilder exists and is a file, we just cannot execute it.  Weak.');", vmBuilderField.getId()));
+					return;
+				}
+				
+				vl.setValue(vmbuilderLocation);
+				cd.saveConfigItem(vl);
 				
 				vm.connect(true);
 			}

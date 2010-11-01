@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd" xml:lang="en" lang="en">
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title>vlove</title>
+</head>
+<body>
+<wicket:extend>
+	<form wicket:id="confirmForm">
+	<h1>VM Confirmation Page</h1>
+	<p>Here are the details for the VM you wanted to create.  If this is okay, scroll down to the bottom and click the 'create' button.</p>
+	<h3>Basic Stuff</h3>
+	<div>
+		<label>VM name</label>
+		<input type="text" wicket:id="vmName" />
+	</div>
+	<div class="spacer"></div>
+	<div>
+		<label>suite</label>
+		<input type="text" wicket:id="suite" />
+	</div>
+	<div class="spacer"></div>
+	<div>
+		<label>architecture</label>
+		<input type="text" wicket:id="arch" />
+	</div>
+	<div class="spacer"></div>
+	<h3>Hardware Stuff</h3>
+	<div>
+		<label>number of processors</label>
+		<input type="text" wicket:id="numProcs" />
+	</div>
+	<div class="spacer"></div>
+	<div>
+		<label>memory size</label>
+		<input type="text" wicket:id="memSize" />
+	</div>
+	<div class="spacer"></div>
+	<div>
+		<label>storage pool</label>
+		<input type="text" wicket:id="storagePools" />
+	</div>
+	<div class="spacer"></div>
+	<div>
+		<label>disk size</label>
+		<input type="text" wicket:id="diskSize" />
+	</div>
+	<div class="spacer"></div>
+	<h3>Networking Stuff</h3>
+	<div>
+		<label>network</label>
+		<input type="text" wicket:id="networks" />
+	</div>
+	<div class="spacer"></div>
+	<div wicket:id="bridgeContainer">
+		<div>
+			<label>bridge</label>
+			<input type="text" wicket:id="bridge" />
+		</div>
+		<div class="spacer"></div>
+	</div>
+	<input type="submit" value="Create" />
+	</form>
+</wicket:extend>
+</body>
+</html>

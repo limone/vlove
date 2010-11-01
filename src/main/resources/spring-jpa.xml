@@ -6,7 +6,6 @@
 		<constructor-arg value="-tcp,-tcpAllowOthers,true,-tcpPort,8043" />
 	</bean>
 
-
 	<bean id="datasource" class="com.mchange.v2.c3p0.ComboPooledDataSource" depends-on="h2Server">
 		<property name="driverClass" value="org.h2.Driver" />
 		<property name="initialPoolSize" value="5" />

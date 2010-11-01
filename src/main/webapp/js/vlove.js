@@ -45,7 +45,7 @@ function inputRequired(id, message) {
 	i.removeClass('valid');
 	i.addClass('required');
 	
-	/*if (message != null && !message == '') {
+	if (message != null && !message == '') {
 		var sibs = i.siblings(':input');
 		if (sibs.length == 0) {
 			i.after('<div class="calloutContainer" id="'+id+'err"><div class="calloutContent">'+message+'</div><div class="calloutLeft"><div class="calloutLeft2"></div></div>');
@@ -56,7 +56,7 @@ function inputRequired(id, message) {
 		var e = $('#'+id+'err');
 		if (sibs.length == 0) {
 			var o = i.offset();
-			e.css({'left':o.left+20,'top':o.top-10});
+			e.css({'left':o.left+220,'top':o.top});
 		} else {
 			var o = i.position();
 			e.css({'left':o.left-i.width(),'top':o.top+35});
@@ -64,7 +64,7 @@ function inputRequired(id, message) {
 		e.fadeIn(1000);
 	} else {
 		$('#'+id+'.ui-checkbox').addClass('ui-checkbox-state-error');
-	}*/
+	}
 }
 
 function clearError(id) {

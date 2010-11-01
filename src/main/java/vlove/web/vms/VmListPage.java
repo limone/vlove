@@ -8,6 +8,7 @@ import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.util.ListModel;
@@ -40,6 +41,8 @@ public class VmListPage extends BasePage {
 		
 		final WebMarkupContainer container = new WebMarkupContainer("container");
 		add(container.setOutputMarkupId(true));
+		
+		container.add(new BookmarkablePageLink<Object>("createVmLink", VmCreatePage.class));
 
 		final ReloadableModel reloadableModel = new ReloadableModel(vm);
 		final ListView<InternalDomain> vms = new ListView<InternalDomain>("repeater", reloadableModel) {

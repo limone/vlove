@@ -29,6 +29,12 @@ public class ConfigDaoImpl implements ConfigDao {
 
 	@Override
 	public void saveConfigItem(ConfigItem item) {
-		gd.merge(item);
+		ConfigItem tmp = getConfigItem(item.getKey());
+		if (tmp == null) {
+			gd.persist(item);
+		} else {
+			tmp.setValue(item.getValue());
+			gd.merge(tmp);
+		}
 	}
 }

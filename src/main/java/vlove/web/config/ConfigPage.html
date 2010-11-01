@@ -9,13 +9,18 @@
 	<h2>Configuration</h2>
 	<div>
 	<form wicket:id="configForm">
-	<div>* all fields are required</div>
+	<div style="margin-bottom:20px">* all fields are required</div>
 	<div>
 		<label>address <span class="small">url for libvirt</span></label>
 		<input type="text" wicket:id="libvirtUrl" />
-		<button wicket:id="save" type="submit">save</button>
 	</div>
 	<div class="spacer"></div>
+	<div>
+		<label>vmbuilder location <span class="small">path (dir only) to vmbuilder</span></label>
+		<input type="text" wicket:id="vmbuilderLocation" />
+	</div>
+	<div class="spacer"></div>
+	<button wicket:id="save" type="submit">save</button>
 	</form>
 	</div>
 </wicket:extend>
