@@ -13,11 +13,13 @@ public class HomePage extends BasePage {
 		super();
 		
 		String capabilities = null;
-		try {
-			Capabilities c = vm.getCapabilities();
-			capabilities = String.format("%s %s - %s - %d cores", c.getVendor(), c.getModel(), c.getCpuArch(), c.getNumProcs());
-		} catch (VirtException ve) {
-			log.warn("Could not retrieve capabilities.", ve);
+		if (vm.validateConfig()) {
+			try {
+				Capabilities c = vm.getCapabilities();
+				capabilities = String.format("%s %s - %s - %d cores", c.getVendor(), c.getModel(), c.getCpuArch(), c.getNumProcs());
+			} catch (VirtException ve) {
+				log.warn("Could not retrieve capabilities.", ve);
+			}
 		}
 		add(new Label("capabilities", capabilities));
 	}
