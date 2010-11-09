@@ -197,38 +197,46 @@ public class VirtManager implements Serializable {
 		try {
 			for (int did : connection.listDomains()) {
 				Domain d = connection.domainLookupByID(did);
-				domains.add(new InternalDomain(did, d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
+				domains.add(new InternalDomain(did, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
 			}
 
 			for (String domainName : connection.listDefinedDomains()) {
 				Domain d = connection.domainLookupByName(domainName);
-				domains.add(new InternalDomain(0, d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
+				domains.add(new InternalDomain(0, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
 			}
 		} catch (LibvirtException le) {
 			log.error("Could not list domains.", le);
 		}
+		log.debug("Domain: {}", domains);
 		return domains;
 	}
 
-	public InternalDomain getDomain(Integer domainId) {
+	public InternalDomain getDomain(Integer domainId) throws VirtException {
 		checkConnected();
 		try {
 			Domain d = connection.domainLookupByID(domainId);
-			return new InternalDomain(domainId, d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
+			return new InternalDomain(domainId, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
 		} catch (LibvirtException le) {
-			log.error(String.format("Could not retrieve domain for ID %d.", domainId));
-			return null;
+			throw new VirtException(String.format("Could not retrieve domain for ID %d.", domainId));
 		}
 	}
 
-	public InternalDomain getDomain(String domainName) {
+	public InternalDomain getDomain(String domainName) throws VirtException {
 		checkConnected();
 		try {
 			Domain d = connection.domainLookupByName(domainName);
-			return new InternalDomain(d.getID(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
+			return new InternalDomain(d.getID(), d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
 		} catch (LibvirtException le) {
-			log.error(String.format("Could not retrieve domain for name %s.", domainName), le);
-			return null;
+			throw new VirtException(String.format("Could not retrieve domain for name %s.", domainName), le);
+		}
+	}
+	
+	public InternalDomain getDomainByUUID(String uuid) throws VirtException{
+		try {
+			Domain d = connection.domainLookupByUUIDString(uuid);
+			return new InternalDomain(d.getID(), d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
+		} catch (LibvirtException le) {
+			throw new VirtException(String.format("Could not retrieve domain for UUID %s.", uuid));
 		}
 	}
 
@@ -243,7 +251,7 @@ public class VirtManager implements Serializable {
 			d = connection.domainLookupByName(domainName);
 			return new Pair<Boolean, Integer>(Boolean.TRUE, d.getID());
 		} catch (LibvirtException le) {
-			log.error(String.format("Could not start domain %d.", domainName), le);
+			log.error(String.format("Could not start domain %s.", domainName), le);
 			return new Pair<Boolean, Integer>(Boolean.FALSE, 0);
 		}
 	}

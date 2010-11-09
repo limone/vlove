@@ -6,41 +6,81 @@
 </head>
 <body>
 <wicket:extend>
-	<div wicket:id="container">
 	<div>
 		<div style="text-align:right; float:right">
 			<button wicket:id="createVmLink">Create VM</button>
 		</div>
 		<h1>Available VMs</h1>
 	</div>
-	<table style="margin: 0px auto">
+	<div wicket:id="container">
+	<table style="width: 100%">
 		<thead>
 			<tr>
 				<th style="width:100px">name</th>
 				<th style="width:100px">id</th>
-				<th style="width:100px;text-align:center">status</th>
+				<th style="width:100px">status</th>
 				<th style="width:100px">cpu usage</th>
-				<th style="width:125px">memory usage</th>
+				<th style="width:150px">memory usage</th>
 				<th style="width:120px">&nbsp;</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr wicket:id="repeater">
 				<td><wicket:container wicket:id="name" /></td>
-				<td><wicket:container wicket:id="domainId" /></td>
+				<td><wicket:container wicket:id="domainId" /><input type="hidden" wicket:id="uuid" /></td>
 				<td><img wicket:id="statusImage" alt="" />&nbsp;<wicket:container wicket:id="status" /></td>
 				<td><span wicket:id="cpuUsage" /></td>
 				<td><span wicket:id="memoryUsage" /></td>
 				<td style="text-align:center">
-					<a wicket:id="start"><img wicket:id="startImage" alt="" /></a>&nbsp;
-					<a wicket:id="pause"><img wicket:id="pauseImage" alt="" /></a>&nbsp;
-					<a wicket:id="stop"><img wicket:id="stopImage" alt="" /></a>&nbsp;
-					<a wicket:id="destroy"><img wicket:id="destroyImage" alt="" /></a>
+					<a wicket:id="power"><img wicket:id="powerImage" alt="" height="16" width="16" title="toggle power" /></a>&nbsp;
+					<a wicket:id="pause"><img wicket:id="pauseImage" alt="" height="16" width="16" title="pause" /></a>&nbsp;
+					<a wicket:id="destroy"><img wicket:id="destroyImage" alt="" height="16" width="16" title="destroy" /></a>
 				</td>
 			</tr>
 		</tbody>
 	</table>
 	</div>
+	<script type="text/javascript" wicket:id="callbackUrl"></script>
+	<script type="text/javascript">
+	var cpuStat = null;
+	var memStat = null;
+	
+	jQuery.fn.log = function (msg) {
+		console.log("%s: %o", msg, this);
+		return this;
+	};
+	
+	$(document).ready(function(){
+		window.setInterval(function() {
+			var uuids = [];
+			$("[type=hidden]").each(function() {
+				uuids.push($(this).val());
+			});
+			if (uuids.length > 0) {
+				$.get(callbackUrl, {uuids: uuids}, function(data) {
+					$(data).find("evaluate").each(function() {
+						var output = $(this).text().replace(/\^/gi, '');
+						eval(output);
+					});
+				}, 'xml');
+				$.each(uuids, function(index, val) {
+					if (cpuStat) {
+						var cpuVal = cpuStat[val];
+						if (cpuVal) {
+							$('#cpuUsage-'+val).sparkline(cpuVal, {width:'100px',height:'25px',chartRangeMin:'0',chartRangeMax:'100',spotColor:'',minSpotColor:'',maxSpotColor:'',lineWidth:'2'});
+						}
+					}
+					if (memStat) {
+						var memVal = memStat[val];
+						if (memVal) {
+							$('#memoryUsage-'+val).sparkline(memVal, {width:'100px',height:'25px',chartRangeMin:'0',chartRangeMax:'100',spotColor:'',minSpotColor:'',maxSpotColor:'',lineWidth:'2'});
+						}
+					}
+				});
+			}
+		}, 5000);
+	});
+	</script>
 </wicket:extend>
 </body>
 </html>

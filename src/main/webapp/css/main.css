@@ -303,3 +303,7 @@ input[disabled] {
 	color:#555555;
 	font-weight:normal;
 }
+
+input[type="checkbox"] {
+	margin: 2px !important;
+}

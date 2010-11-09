@@ -6,6 +6,7 @@ import org.libvirt.DomainInfo.DomainState;
 
 public class InternalDomain implements Serializable {
 	private int domainId;
+	private String uuid;
 	private String domainName;
 	private DomainState state;
 	private long totalMemory;
@@ -16,13 +17,19 @@ public class InternalDomain implements Serializable {
 		// empty
 	}
 
-	public InternalDomain(int domainId, String domainName, DomainState state, long totalMemory, long cpuTime, long memoryUsage) {
+	public InternalDomain(int domainId, String uuid, String domainName, DomainState state, long totalMemory, long cpuTime, long memoryUsage) {
 		this.domainId = domainId;
+		this.uuid = uuid;
 		this.domainName = domainName;
 		this.state = state;
 		this.totalMemory = totalMemory;
 		this.cpuTime = cpuTime;
 		this.memoryUsage = memoryUsage;
+	}
+
+	@Override
+	public String toString() {
+		return "InternalDomain [domainId=" + domainId + ", uuid=" + uuid + ", domainName=" + domainName + ", state=" + state + ", totalMemory=" + totalMemory + ", cpuTime=" + cpuTime + ", memoryUsage=" + memoryUsage + "]";
 	}
 
 	public int getDomainId() {
@@ -31,6 +38,14 @@ public class InternalDomain implements Serializable {
 
 	public void setDomainId(int domainId) {
 		this.domainId = domainId;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getDomainName() {
