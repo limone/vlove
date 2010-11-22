@@ -3,11 +3,16 @@ package vlove.virt;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import vlove.VirtException;
 import vlove.dao.ConfigDao;
 import vlove.model.NewVmWizardModel;
 
@@ -18,7 +23,9 @@ public class VirtBuilder {
 	@Autowired
 	private ConfigDao cd;
 	
-	public void createVirtMachine(NewVmWizardModel newVm) {
+	private List<String> createVirtMachineCommand(NewVmWizardModel newVm) {
+		// TODO Validate that the model is configured properly
+		
 		List<String> command = new ArrayList<String>();
 		command.add("vmbuilder");
 		command.add("kvm");
@@ -42,5 +49,32 @@ public class VirtBuilder {
 		command.add(String.format("--mem=%d", newVm.getMemSize()));
 		
 		log.debug("Command: {}", command);
+		return command;
+	}
+	
+	/**
+	 * Returns the exit value of the process.
+	 * 
+	 * @param out
+	 * @param err
+	 * @return
+	 * @throws VirtException
+	 */
+	public int createVirtualMachine(NewVmWizardModel newVm, StreamConsumer out, StreamConsumer err) throws VirtException {
+		List<String> command = createVirtMachineCommand(newVm);
+		if (command == null || command.size() < 1) {
+			throw new VirtException("Command needs to be provided.");
+		}
+		
+		try {
+			Commandline cs = new Commandline();
+			cs.setExecutable(command.get(0));
+			if (command.size() > 1) {
+				cs.addArguments(command.subList(1, command.size()).toArray(new String[]{}));
+			}
+			return CommandLineUtils.executeCommandLine(cs, out, err);
+		} catch (CommandLineException ce) {
+			throw new VirtException("Could not execute command.", ce);
+		}
 	}
 }

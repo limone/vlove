@@ -7,60 +7,64 @@
 <body>
 <wicket:extend>
 	<form wicket:id="confirmForm">
-	<h1>VM Confirmation Page</h1>
-	<p>Here are the details for the VM you wanted to create.  If this is okay, scroll down to the bottom and click the 'create' button.</p>
-	<h3>Basic Stuff</h3>
-	<div>
-		<label>VM name</label>
-		<input type="text" wicket:id="vmName" />
-	</div>
-	<div class="spacer"></div>
-	<div>
-		<label>suite</label>
-		<input type="text" wicket:id="suite" />
-	</div>
-	<div class="spacer"></div>
-	<div>
-		<label>architecture</label>
-		<input type="text" wicket:id="arch" />
-	</div>
-	<div class="spacer"></div>
-	<h3>Hardware Stuff</h3>
-	<div>
-		<label>number of processors</label>
-		<input type="text" wicket:id="numProcs" />
-	</div>
-	<div class="spacer"></div>
-	<div>
-		<label>memory size</label>
-		<input type="text" wicket:id="memSize" />
-	</div>
-	<div class="spacer"></div>
-	<div>
-		<label>storage pool</label>
-		<input type="text" wicket:id="storagePools" />
-	</div>
-	<div class="spacer"></div>
-	<div>
-		<label>disk size</label>
-		<input type="text" wicket:id="diskSize" />
-	</div>
-	<div class="spacer"></div>
-	<h3>Networking Stuff</h3>
-	<div>
-		<label>network</label>
-		<input type="text" wicket:id="networks" />
-	</div>
-	<div class="spacer"></div>
-	<div wicket:id="bridgeContainer">
+		<h1>VM Confirmation</h1>
+		<p>Here are the details for the VM you wanted to create.  If this is okay, scroll down to the bottom and click the 'create' button.</p>
+		<h3>Basic Stuff</h3>
 		<div>
-			<label>bridge</label>
-			<input type="text" wicket:id="bridge" />
+			<label>VM name</label>
+			<input type="text" wicket:id="vmName" />
 		</div>
 		<div class="spacer"></div>
-	</div>
-	<input type="submit" value="Create" />
+		<div>
+			<label>suite</label>
+			<input type="text" wicket:id="suite" />
+		</div>
+		<div class="spacer"></div>
+		<div>
+			<label>architecture</label>
+			<input type="text" wicket:id="arch" />
+		</div>
+		<div class="spacer"></div>
+		<h3>Hardware Stuff</h3>
+		<div>
+			<label>number of processors</label>
+			<input type="text" wicket:id="numProcs" />
+		</div>
+		<div class="spacer"></div>
+		<div>
+			<label>memory size</label>
+			<input type="text" wicket:id="memSize" />
+		</div>
+		<div class="spacer"></div>
+		<div>
+			<label>storage pool</label>
+			<input type="text" wicket:id="storagePools" />
+		</div>
+		<div class="spacer"></div>
+		<div>
+			<label>disk size</label>
+			<input type="text" wicket:id="diskSize" />
+		</div>
+		<div class="spacer"></div>
+		<h3>Networking Stuff</h3>
+		<div>
+			<label>network</label>
+			<input type="text" wicket:id="networks" />
+		</div>
+		<div class="spacer"></div>
+		<div wicket:id="bridgeContainer">
+			<div>
+				<label>bridge</label>
+				<input type="text" wicket:id="bridge" />
+			</div>
+			<div class="spacer"></div>
+		</div>
+		<input type="submit" value="Create" wicket:id="submit" />
 	</form>
+	
+	<div wicket:id="status">
+		<div wicket:id="output" id="output"></div>
+	</div>
 </wicket:extend>
 </body>
 </html>

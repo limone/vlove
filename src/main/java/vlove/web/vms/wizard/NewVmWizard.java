@@ -5,7 +5,7 @@ import org.apache.wicket.extensions.wizard.WizardModel;
 import org.apache.wicket.model.CompoundPropertyModel;
 
 import vlove.model.NewVmWizardModel;
-import vlove.web.vms.VmCreateConfirmPage;
+import vlove.web.vms.VmCreateBuildPage;
 import vlove.web.vms.VmListPage;
 
 public class NewVmWizard extends Wizard {
@@ -31,6 +31,6 @@ public class NewVmWizard extends Wizard {
 	public void onFinish() {
 		// Redirect to the confirmation page
 		setRedirect(true);
-		setResponsePage(new VmCreateConfirmPage(wizMod));
+		setResponsePage(new VmCreateBuildPage(wizMod));
 	}
 }
