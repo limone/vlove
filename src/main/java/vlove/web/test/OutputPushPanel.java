@@ -42,12 +42,10 @@ public class OutputPushPanel extends PushPanel {
 
 	@Override
 	protected void pushCallback(AjaxRequestTarget target) {
-		log.debug("Callback.");
 		synchronized (q) {
 			final String lastVal = q.poll();
 			if (lastVal != null) {
-				log.debug("Push callback happening: {}", lastVal);
-				target.appendJavascript("var test='" + StringEscapeUtils.escapeJavaScript(lastVal) + "';");
+				target.appendJavascript("updateOutput('output', '" + StringEscapeUtils.escapeJavaScript(lastVal) + "');");
 			}
 
 			if (q.peek() != null) {
@@ -113,7 +111,6 @@ public class OutputPushPanel extends PushPanel {
 		public void consumeLine(String line) {
 			Application.set(app);
 			synchronized (q) {
-				log.debug("Got line: {}", line);
 				try {
 					q.put(line);
 				} catch (InterruptedException e) {

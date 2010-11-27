@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class ConfigForm implements Serializable {
 	private String libvirtUrl;
 	private String vmbuilderLocation;
+	private String sudoPassword;
 	
 	public ConfigForm() {
 		// empty
@@ -24,5 +25,13 @@ public class ConfigForm implements Serializable {
 
 	public void setVmbuilderLocation(String vmbuilderLocation) {
 		this.vmbuilderLocation = vmbuilderLocation;
+	}
+
+	public String getSudoPassword() {
+		return sudoPassword;
+	}
+
+	public void setSudoPassword(String sudoPassword) {
+		this.sudoPassword = sudoPassword;
 	}
 }

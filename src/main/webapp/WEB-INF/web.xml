@@ -50,7 +50,7 @@
 		<servlet-name>icepush</servlet-name>
 		<servlet-class>org.icepush.servlet.ICEpushServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
-		<async-supported>true</async-supported>
+		<async-supported>false</async-supported>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>icepush</servlet-name>

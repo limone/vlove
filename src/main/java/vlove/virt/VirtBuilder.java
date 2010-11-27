@@ -1,7 +1,12 @@
 package vlove.virt;
 
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -18,7 +23,7 @@ import vlove.model.NewVmWizardModel;
 
 @Service
 public class VirtBuilder {
-	private transient final Logger log = LoggerFactory.getLogger(getClass());
+	transient final Logger log = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
 	private ConfigDao cd;
@@ -27,6 +32,7 @@ public class VirtBuilder {
 		// TODO Validate that the model is configured properly
 		
 		List<String> command = new ArrayList<String>();
+		command.add("sudo");
 		command.add("vmbuilder");
 		command.add("kvm");
 		command.add("ubuntu");
@@ -72,9 +78,61 @@ public class VirtBuilder {
 			if (command.size() > 1) {
 				cs.addArguments(command.subList(1, command.size()).toArray(new String[]{}));
 			}
-			return CommandLineUtils.executeCommandLine(cs, out, err);
+			PipedOutputStream pOut = new PipedOutputStream();
+			PipedInputStream pIs = new PipedInputStream(pOut);
+			
+			List<ConsumerListener> listeners = new ArrayList<ConsumerListener>();
+			listeners.add(new ConsumerListener(pOut, Pattern.compile("\\[sudo\\] password for \\w+:"), cd.getConfigItem("sudoPassword").getValue()));
+			
+			NestedStreamConsumer nOut = new NestedStreamConsumer(listeners, pOut, out);
+			return CommandLineUtils.executeCommandLine(cs, pIs, nOut, err);
 		} catch (CommandLineException ce) {
 			throw new VirtException("Could not execute command.", ce);
+		} catch (IOException ie) {
+			throw new VirtException("Could not execute command.", ie);
+		}
+	}
+	
+	private class NestedStreamConsumer implements StreamConsumer {
+		private final List<ConsumerListener> listeners; 
+		private final PipedOutputStream pOut;
+		private final StreamConsumer upstream;
+		
+		public NestedStreamConsumer(List<ConsumerListener> listeners, PipedOutputStream pOut, StreamConsumer upstream) {
+			this.listeners = listeners;
+			this.pOut = pOut;
+			this.upstream = upstream;
+		}
+
+		@Override
+		public void consumeLine(String line) {
+			for (ConsumerListener cl : listeners) {
+				cl.consumeLine(line);
+			}
+			upstream.consumeLine(line);
+		}
+	}
+	
+	private class ConsumerListener {
+		private final PipedOutputStream pOut;
+		private final Pattern p;
+		private final String action;
+		
+		public ConsumerListener(PipedOutputStream pOut, Pattern p, String action) {
+			this.pOut = pOut;
+			this.p = p;
+			this.action = action;
+		}
+		
+		public void consumeLine(String line) {
+			Matcher m = p.matcher(line);
+			if (m.matches()) {
+				try {
+					pOut.write(action.getBytes());
+				} catch (IOException ie) {
+					log.warn("Could not write to piped output stream.", ie);
+				}
+			}
 		}
 	}
 }

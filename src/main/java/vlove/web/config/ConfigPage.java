@@ -5,6 +5,7 @@ import java.io.File;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -38,8 +39,13 @@ public class ConfigPage extends BasePage {
 		final ConfigItem vl = cd.getConfigItem("vmbuilder.location");
 		configModel.setVmbuilderLocation(vl.getValue());
 		
+		final ConfigItem sp = cd.getConfigItem("sudo.password");
+		configModel.setSudoPassword(sp.getValue());
+		
 		Form<ConfigForm> configForm = new Form<ConfigForm>("configForm", new CompoundPropertyModel<ConfigForm>(configModel));
 		configForm.add(new RequiredTextField<String>("libvirtUrl"));
+		configForm.add(new PasswordTextField("sudoPassword"));
+		
 		final RequiredTextField<String> vmBuilderField = new RequiredTextField<String>("vmbuilderLocation");
 		configForm.add(vmBuilderField);
 		configForm.add(new AjaxButton("save", configForm) {
@@ -75,6 +81,12 @@ public class ConfigPage extends BasePage {
 				
 				vl.setValue(vmbuilderLocation);
 				cd.saveConfigItem(vl);
+				
+				if (configModel.getSudoPassword() != null && configModel.getSudoPassword().length() > 0) {
+					log.debug("Saving sudo password.");
+					sp.setValue(configModel.getSudoPassword());
+					cd.saveConfigItem(sp);
+				}
 				
 				vm.connect(true);
 			}

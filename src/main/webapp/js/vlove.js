@@ -73,3 +73,9 @@ function clearError(id) {
 	$('#'+id+'err').remove();
 	$('#'+id+'.ui-checkbox').removeClass('ui-checkbox-state-error');
 }
+
+function updateOutput(id, data) {
+	$('#'+id).html(function(index, oldHtml) {
+		$(this).html(oldHtml + '<br/>' + data);
+	});
+}
