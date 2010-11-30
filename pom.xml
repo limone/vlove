@@ -48,6 +48,17 @@
 			<url>https://dev.limone.me/nexus/content/groups/public/</url>
 		</repository>
 	</repositories>
+	
+	<distributionManagement>
+		<repository>
+			<id>limone-releases</id>
+			<url>https://dev.limone.me/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>limone-snapshots</id>
+			<url>https://dev.limone.me/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<properties>
 		<spring.version>3.0.4.RELEASE</spring.version>

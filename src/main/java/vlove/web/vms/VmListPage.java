@@ -43,6 +43,7 @@ import vlove.web.BasePage;
 
 import com.sun.management.OperatingSystemMXBean;
 
+@SuppressWarnings("restriction")
 @MountPath(path = "/vms/list")
 public class VmListPage extends BasePage {
 	transient final Logger log = LoggerFactory.getLogger(getClass());

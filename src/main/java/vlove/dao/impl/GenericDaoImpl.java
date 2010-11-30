@@ -1,3 +1,21 @@
+/**
+ * vlove - web based virtual machine management
+ * Copyright (C) 2010 Limone Fresco Limited
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 package vlove.dao.impl;
 
 import java.util.List;
@@ -28,21 +46,34 @@ public class GenericDaoImpl implements GenericDao {
 		}
 	}
 
+	/**
+	 * @see vlove.dao.GenericDao#find(Class, Object)
+	 */
 	@Override
 	public <T> T find(Class<T> entityClass, Object identifier) {
 		return em.find(entityClass, identifier);
 	}
 
+	/**
+	 * @see vlove.dao.GenericDao#merge(Object)
+	 */
 	@Override
 	public <T> T merge(T entity) {
 		return em.merge(entity);
 	}
+	
+	/**
+	 * @see vlove.dao.GenericDao#persist(Object)
+	 */
 	@Override
 	public <T> T persist(T entity) {
 		em.persist(entity);
 		return entity;
 	}
 
+	/**
+	 * @see vlove.dao.GenericDao#query(String, Map)
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> query(String query, Map<String, Object> parameters) {
@@ -51,6 +82,9 @@ public class GenericDaoImpl implements GenericDao {
 		return q.getResultList();
 	}
 
+	/**
+	 * @see vlove.dao.GenericDao#query(String, Map, int, int)
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> query(String query, Map<String, Object> parameters, int firstResult, int maxResults) {
@@ -58,6 +92,10 @@ public class GenericDaoImpl implements GenericDao {
 		applyParameters(q, parameters);
 		return q.getResultList();
 	}
+	
+	/**
+	 * @see vlove.dao.GenericDao#namedQuery(String, Map)
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> namedQuery(String query, Map<String, Object> parameters) {
@@ -66,6 +104,9 @@ public class GenericDaoImpl implements GenericDao {
 		return q.getResultList();
 	}
 
+	/**
+	 * @see vlove.dao.GenericDao#namedQuery(String, Map, int, int)
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> namedQuery(String query, Map<String, Object> parameters, int firstResult, int maxResults) {
@@ -74,6 +115,9 @@ public class GenericDaoImpl implements GenericDao {
 		return q.getResultList();
 	}
 	
+	/**
+	 * @see vlove.dao.GenericDao#namedQuerySingle(String, Map)
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T namedQuerySingle(String query, Map<String, Object> parameters) {
@@ -86,6 +130,9 @@ public class GenericDaoImpl implements GenericDao {
 		}
 	}
 
+	/**
+	 * @see vlove.dao.GenericDao#querySingle(String, Map)
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T querySingle(String query, Map<String, Object> parameters) {
@@ -94,6 +141,9 @@ public class GenericDaoImpl implements GenericDao {
 		return (T)q.getSingleResult();
 	}
 
+	/**
+	 * @see vlove.dao.GenericDao#remove(Object)
+	 */
 	@Override
 	public void remove(Object entity) {
 		if (em.contains(entity)) {
@@ -101,11 +151,17 @@ public class GenericDaoImpl implements GenericDao {
 		}
 	}
 	
+	/**
+	 * @see vlove.dao.GenericDao#refresh(Object)
+	 */
 	@Override
 	public void refresh(Object entity) {
 		em.refresh(entity);
 	}
 
+	/**
+	 * @see vlove.dao.GenericDao#nativeQuery(String, Map, Integer)
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> nativeQuery(String query, Map<String, Object> parameters, Integer maxResults) {
