@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -22,6 +23,11 @@ public class TestVirtManager {
 	
 	@Autowired
 	private VirtManager vm;
+	
+	@Before
+	private void init() {
+		vm.init();
+	}
 	
 	@Test
 	public void testVirtManager() {
