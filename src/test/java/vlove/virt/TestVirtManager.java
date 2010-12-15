@@ -47,6 +47,8 @@ public class TestVirtManager {
 	
 	@Test
 	public void testGetDomains() {
+		vm.init("qemu+unix:///system");
+		vm.connect();
 		List<InternalDomain> domains = vm.getDomains();
 		for (InternalDomain domain : domains) {
 			log.debug("Domain: {}", domain.getDomainName());
@@ -55,6 +57,8 @@ public class TestVirtManager {
 	
 	@Test
 	public void testGetCapabilities() throws VirtException {
+		vm.init("qemu+unix:///system");
+		vm.connect();
 		assertNotNull(vm.getCapabilities());
 	}
 }
