@@ -25,8 +25,8 @@ public class TestVirtManager {
 	private VirtManager vm;
 	
 	@Before
-	private void init() {
-		vm.init();
+	public void init() {
+		// empty
 	}
 	
 	@Test
@@ -41,6 +41,7 @@ public class TestVirtManager {
 	
 	@Test
 	public void testConnect() {
+		vm.init("qemu+unix:///system");
 		vm.connect();
 	}
 	
