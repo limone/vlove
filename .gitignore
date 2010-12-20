@@ -4,3 +4,4 @@
 .springBeans
 target/
 *.h2.*
+MANIFEST.MF

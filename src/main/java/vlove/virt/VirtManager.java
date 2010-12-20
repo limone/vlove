@@ -1,3 +1,21 @@
+/**
+ * vlove - web based virtual machine management
+ * Copyright (C) 2010 Limone Fresco Limited
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 package vlove.virt;
 
 import java.io.File;
@@ -35,6 +53,12 @@ import vlove.util.XPathUtils;
 
 import com.sun.management.OperatingSystemMXBean;
 
+/**
+ * The meat and potatoes of vlove - the interface to libvirt.
+ * 
+ * @author Michael Laccetti
+ */
+@SuppressWarnings("restriction")
 @Service
 public class VirtManager implements Serializable {
 	private transient final Logger log = LoggerFactory.getLogger(getClass());
@@ -61,6 +85,9 @@ public class VirtManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Post-constructor init method - connects to libvirt.
+	 */
 	@PostConstruct
 	public void init() {
 		final String os = System.getProperty("os.name");
@@ -114,10 +141,18 @@ public class VirtManager implements Serializable {
 		disconnect();
 	}
 
+	/**
+	 * Check to see if we are connected to libvirt.
+	 * @return
+	 */
 	public boolean isConnected() {
 		return isConnected;
 	}
 
+	/**
+	 * Check to make sure that all of the configuration variables have been set.
+	 * @return
+	 */
 	public boolean validateConfig() {
 		log.debug("Validating config.");
 		if (cd.getConfigItem("libvirt.url").getValue() == null || cd.getConfigItem("vmbuilder.location").getValue() == null) {
@@ -128,6 +163,11 @@ public class VirtManager implements Serializable {
 		return true;
 	}
 
+	/**
+	 * Connect to libvirt
+	 * @param restart If true, reload the libvirt URL from the configuration system.
+	 * @return
+	 */
 	public boolean connect(boolean restart) {
 		if (restart) {
 			libvirtUrl = cd.getConfigItem("libvirt.url").getValue();
@@ -135,6 +175,10 @@ public class VirtManager implements Serializable {
 		return connect();
 	}
 
+	/**
+	 * Connect to libvirt using the URL pulled out during the init() process.
+	 * @return
+	 */
 	public boolean connect() {
 		try {
 			log.debug("Attempting connection to {}.", libvirtUrl);
@@ -148,6 +192,9 @@ public class VirtManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Disconnect from libvirt.
+	 */
 	public void disconnect() {
 		if (isConnected) {
 			try {
@@ -162,6 +209,11 @@ public class VirtManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Retrieve the hardware capabilities of the host that libvirt is runnign on.
+	 * @return
+	 * @throws VirtException
+	 */
 	public Capabilities getCapabilities() throws VirtException {
 		checkConnected();
 
@@ -190,6 +242,10 @@ public class VirtManager implements Serializable {
 		return c;
 	}
 
+	/**
+	 * Retrieve all the VMs defined.
+	 * @return
+	 */
 	public List<InternalDomain> getDomains() {
 		checkConnected();
 		log.debug("Retrieving all domains.");
@@ -211,6 +267,12 @@ public class VirtManager implements Serializable {
 		return domains;
 	}
 
+	/**
+	 * Retrieve a specific VM, by numeric ID.
+	 * @param domainId
+	 * @return
+	 * @throws VirtException
+	 */
 	public InternalDomain getDomain(Integer domainId) throws VirtException {
 		checkConnected();
 		try {
@@ -221,6 +283,12 @@ public class VirtManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Retrieve a specific VM, by name.
+	 * @param domainName
+	 * @return
+	 * @throws VirtException
+	 */
 	public InternalDomain getDomain(String domainName) throws VirtException {
 		checkConnected();
 		try {
@@ -231,6 +299,12 @@ public class VirtManager implements Serializable {
 		}
 	}
 	
+	/**
+	 * Retrieve a specific VM, by UUID.
+	 * @param uuid
+	 * @return
+	 * @throws VirtException
+	 */
 	public InternalDomain getDomainByUUID(String uuid) throws VirtException{
 		try {
 			Domain d = connection.domainLookupByUUIDString(uuid);
@@ -240,6 +314,11 @@ public class VirtManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Start a VM up.
+	 * @param domainName
+	 * @return
+	 */
 	// TODO convert from a PAIR to a TRIPLE so that we can capture the error
 	// message, if any
 	public Pair<Boolean, Integer> start(String domainName) {
@@ -256,6 +335,11 @@ public class VirtManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Resume a paused VM.
+	 * @param domainId
+	 * @return
+	 */
 	public Pair<Boolean, String> resume(Integer domainId) {
 		checkConnected();
 		try {
@@ -269,6 +353,11 @@ public class VirtManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Pause a running VM.
+	 * @param domainId
+	 * @return
+	 */
 	public Pair<Boolean, String> pause(Integer domainId) {
 		checkConnected();
 		try {
@@ -282,6 +371,11 @@ public class VirtManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Send the ACPI shutdown command to a running VM.
+	 * @param domainId
+	 * @return
+	 */
 	public Pair<Boolean, String> shutdown(Integer domainId) {
 		checkConnected();
 		try {
@@ -295,6 +389,11 @@ public class VirtManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Forcibly terminate a running VM.
+	 * @param domainId
+	 * @return
+	 */
 	public Pair<Boolean, String> destroy(Integer domainId) {
 		checkConnected();
 		try {
@@ -308,6 +407,11 @@ public class VirtManager implements Serializable {
 		}
 	}
 	
+	/**
+	 * Retrieve a list of storage pools.
+	 * @return
+	 * @throws VirtException
+	 */
 	public List<String> getStoragePools() throws VirtException {
 		try {
 			return Arrays.asList(connection.listStoragePools());
@@ -316,6 +420,12 @@ public class VirtManager implements Serializable {
 		}
 	}
 	
+	/**
+	 * Retrieve a specific storage pool.
+	 * @param name
+	 * @return
+	 * @throws VirtException
+	 */
 	public StoragePool getStoragePool(String name) throws VirtException {
 		try {
 			return connection.storagePoolLookupByName(name);
@@ -324,6 +434,11 @@ public class VirtManager implements Serializable {
 		}
 	}
 	
+	/**
+	 * Retrieve all defined networks.
+	 * @return
+	 * @throws VirtException
+	 */
 	public List<String> getNetworks() throws VirtException {
 		try {
 			return Arrays.asList(connection.listNetworks());
@@ -332,6 +447,12 @@ public class VirtManager implements Serializable {
 		}
 	}
 	
+	/**
+	 * Retrieve a specific network.
+	 * @param name
+	 * @return
+	 * @throws VirtException
+	 */
 	public Network getNetwork(String name) throws VirtException {
 		try {
 			return connection.networkLookupByName(name);

@@ -25,6 +25,7 @@ import vlove.virt.VirtManager;
 
 import com.sun.management.OperatingSystemMXBean;
 
+@SuppressWarnings("restriction")
 public class Step2Hardware extends WizardStep {
 	transient final Logger log = LoggerFactory.getLogger(getClass());
 
