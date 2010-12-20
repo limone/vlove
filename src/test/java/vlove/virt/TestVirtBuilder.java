@@ -3,6 +3,7 @@ package vlove.virt;
 import java.io.StringWriter;
 
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public class TestVirtBuilder {
 	@Autowired VirtBuilder vb;
 	
 	@Test
+	@Ignore
 	public void testExecute() {
 		NewVmWizardModel vm = new NewVmWizardModel();
 		vm.setArch("");
