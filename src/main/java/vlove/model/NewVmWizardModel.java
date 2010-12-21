@@ -31,7 +31,7 @@ public class NewVmWizardModel implements Serializable {
 	private String arch;
 	private Integer numProcs;
 	private Integer memSize;
-	private String storagePools;
+	private InternalStoragePool storagePool;
 	private Integer diskSize;
 	private String networks;
 	private String bridge;
@@ -76,12 +76,12 @@ public class NewVmWizardModel implements Serializable {
 		this.memSize = memSize;
 	}
 
-	public String getStoragePools() {
-		return storagePools;
+	public InternalStoragePool getStoragePool() {
+		return storagePool;
 	}
 
-	public void setStoragePools(String storagePools) {
-		this.storagePools = storagePools;
+	public void setStoragePool(InternalStoragePool storagePool) {
+		this.storagePool = storagePool;
 	}
 
 	public Integer getDiskSize() {

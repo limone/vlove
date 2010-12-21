@@ -40,10 +40,10 @@ import vlove.model.InternalDomain;
 import vlove.model.Pair;
 import vlove.virt.VirtManager;
 import vlove.web.BasePage;
+import vlove.web.error.ErrorPage;
 
 import com.sun.management.OperatingSystemMXBean;
 
-@SuppressWarnings("restriction")
 @MountPath(path = "/vms/list")
 public class VmListPage extends BasePage {
 	transient final Logger log = LoggerFactory.getLogger(getClass());
@@ -75,7 +75,15 @@ public class VmListPage extends BasePage {
 		final WebMarkupContainer container = new WebMarkupContainer("container");
 		add(container.setOutputMarkupId(true));
 
-		final ReloadableModel reloadableModel = new ReloadableModel(vm);
+		final ReloadableModel reloadableModel;
+		try {
+			reloadableModel = new ReloadableModel(vm);
+		} catch (VirtException ve) {
+			log.error("Could not create VM model.", ve);
+			setRedirect(true);
+			setResponsePage(ErrorPage.class);
+			return;
+		}
 
 		final ListView<InternalDomain> vms = new ListView<InternalDomain>("repeater", reloadableModel) {
 			@Override
@@ -106,19 +114,24 @@ public class VmListPage extends BasePage {
 				final AjaxLink<Object> power = new AjaxLink<Object>("power") {
 					@Override
 					public void onClick(AjaxRequestTarget target) {
-						if (s == DomainState.VIR_DOMAIN_RUNNING) {
-							log.debug("Shutting down {}/{}", domainId, domainName);
-							vm.shutdown(domainId);
-						} else {
-							log.debug("Starting/resuming {}/{}.", domainId, domainName);
-							if (domainId == 0) {
-								vm.start(domainName);
+						try {
+							if (s == DomainState.VIR_DOMAIN_RUNNING) {
+								log.debug("Shutting down {}/{}", domainId, domainName);
+								vm.shutdown(domainId);
 							} else {
-								vm.resume(domainId);
+								log.debug("Starting/resuming {}/{}.", domainId, domainName);
+								if (domainId == 0) {
+									vm.start(domainName);
+								} else {
+									vm.resume(domainId);
+								}
 							}
+							reloadableModel.reload();
+							target.addComponent(container);
+						} catch (VirtException ve) {
+							log.error(String.format("Could not %s domain %s.", s.toString(), domainName), ve);
+							// TODO show the user an error
 						}
-						reloadableModel.reload();
-						target.addComponent(container);
 					}
 				};
 				if (s == DomainState.VIR_DOMAIN_RUNNING) {
@@ -132,9 +145,14 @@ public class VmListPage extends BasePage {
 					@Override
 					public void onClick(AjaxRequestTarget target) {
 						log.debug("Pausing down {}.", domainId);
-						vm.pause(domainId);
-						reloadableModel.reload();
-						target.addComponent(container);
+						try {
+							vm.pause(domainId);
+							reloadableModel.reload();
+							target.addComponent(container);
+						} catch (VirtException ve) {
+							log.error("Could not pause VM.", ve);
+							// TODO show an error to the user
+						}
 					}
 				};
 				pause.add(new Image("pauseImage", new ContextRelativeResource("/images/pause.png")));
@@ -149,12 +167,12 @@ public class VmListPage extends BasePage {
 							memStat.remove(id.getUuid());
 							cpuStat.remove(id.getUuid());
 							vm.destroy(domainId);
+							
+							reloadableModel.reload();
+							target.addComponent(container);
 						} catch (VirtException ve) {
 							log.error(String.format("Could not destroy VM with ID %d.", domainId), ve);
 						}
-
-						reloadableModel.reload();
-						target.addComponent(container);
 					}
 				};
 				destroy.add(new Image("destroyImage", new ContextRelativeResource("/images/destroy.png")));
@@ -236,15 +254,15 @@ public class VmListPage extends BasePage {
 		mem.add(usage.format(memUsage));
 	}
 
-	private class ReloadableModel extends ListModel<InternalDomain> {
+	private static final class ReloadableModel extends ListModel<InternalDomain> {
 		private final VirtManager virtMgr;
 
-		public ReloadableModel(VirtManager vm) {
+		public ReloadableModel(VirtManager vm) throws VirtException {
 			this.virtMgr = vm;
 			setObject(vm.getDomains());
 		}
 
-		public void reload() {
+		public void reload() throws VirtException {
 			setObject(virtMgr.getDomains());
 		}
 	}

@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import vlove.virt.VirtManager;
 import vlove.web.config.ConfigPage;
+import vlove.web.storage.ListStoragePoolsPage;
 import vlove.web.vms.VmListPage;
 
 /**
@@ -53,7 +54,7 @@ public abstract class BasePage extends WebPage {
 	VirtManager vm;
 	
 	private enum Links {
-		HOME("home", HomePage.class), VMS("vms", VmListPage.class), CONFIG("config", ConfigPage.class);
+		HOME("home", HomePage.class), VMS("vms", VmListPage.class), STORAGE("storage", ListStoragePoolsPage.class), CONFIG("config", ConfigPage.class);
 		
 		private String name;
 		private Class<? extends BasePage> impl;
@@ -71,7 +72,7 @@ public abstract class BasePage extends WebPage {
 			return impl;
 		}
 	}
-	private static final Links[] links = new Links[]{ Links.HOME, Links.VMS, Links.CONFIG };
+	private static final Links[] links = new Links[]{ Links.HOME, Links.VMS, Links.STORAGE, Links.CONFIG };
 	
 	public BasePage() {
 		add(JavascriptPackageResource.getHeaderContribution(WicketEventReference.INSTANCE));

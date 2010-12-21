@@ -48,7 +48,7 @@ import vlove.dao.ConfigDao;
 import vlove.model.Capabilities;
 import vlove.model.ConfigItem;
 import vlove.model.InternalDomain;
-import vlove.model.Pair;
+import vlove.model.InternalStoragePool;
 import vlove.util.XPathUtils;
 
 import com.sun.management.OperatingSystemMXBean;
@@ -58,7 +58,6 @@ import com.sun.management.OperatingSystemMXBean;
  * 
  * @author Michael Laccetti
  */
-@SuppressWarnings("restriction")
 @Service
 public class VirtManager implements Serializable {
 	private transient final Logger log = LoggerFactory.getLogger(getClass());
@@ -246,11 +245,10 @@ public class VirtManager implements Serializable {
 	 * Retrieve all the VMs defined.
 	 * @return
 	 */
-	public List<InternalDomain> getDomains() {
+	public List<InternalDomain> getDomains() throws VirtException {
 		checkConnected();
-		log.debug("Retrieving all domains.");
-		List<InternalDomain> domains = new ArrayList<InternalDomain>();
 		try {
+			List<InternalDomain> domains = new ArrayList<InternalDomain>();
 			for (int did : connection.listDomains()) {
 				Domain d = connection.domainLookupByID(did);
 				domains.add(new InternalDomain(did, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
@@ -260,11 +258,11 @@ public class VirtManager implements Serializable {
 				Domain d = connection.domainLookupByName(domainName);
 				domains.add(new InternalDomain(0, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
 			}
+			return domains;
 		} catch (LibvirtException le) {
 			log.error("Could not list domains.", le);
+			throw new VirtException("Could not list domains.", le);
 		}
-		log.debug("Domain: {}", domains);
-		return domains;
 	}
 
 	/**
@@ -321,17 +319,17 @@ public class VirtManager implements Serializable {
 	 */
 	// TODO convert from a PAIR to a TRIPLE so that we can capture the error
 	// message, if any
-	public Pair<Boolean, Integer> start(String domainName) {
+	public Integer start(String domainName) throws VirtException {
 		checkConnected();
 		try {
 			Domain d = connection.domainLookupByName(domainName);
 			log.debug("Starting domain {}.", domainName);
 			d.create();
 			d = connection.domainLookupByName(domainName);
-			return new Pair<Boolean, Integer>(Boolean.TRUE, d.getID());
+			return d.getID();
 		} catch (LibvirtException le) {
 			log.error(String.format("Could not start domain %s.", domainName), le);
-			return new Pair<Boolean, Integer>(Boolean.FALSE, 0);
+			throw new VirtException(String.format("Could not start domain %s.", domainName), le);
 		}
 	}
 
@@ -340,16 +338,15 @@ public class VirtManager implements Serializable {
 	 * @param domainId
 	 * @return
 	 */
-	public Pair<Boolean, String> resume(Integer domainId) {
+	public void resume(Integer domainId) throws VirtException {
 		checkConnected();
 		try {
 			Domain d = connection.domainLookupByID(domainId);
 			log.debug("Resuming domain {}.", domainId);
 			d.resume();
-			return new Pair<Boolean, String>(Boolean.TRUE, "Domain resumed.");
 		} catch (LibvirtException le) {
 			log.error(String.format("Could not resume domain %d.", domainId), le);
-			return new Pair<Boolean, String>(Boolean.FALSE, le.getMessage());
+			throw new VirtException(String.format("Could not resume domain %d.", domainId), le);
 		}
 	}
 
@@ -358,16 +355,15 @@ public class VirtManager implements Serializable {
 	 * @param domainId
 	 * @return
 	 */
-	public Pair<Boolean, String> pause(Integer domainId) {
+	public void pause(Integer domainId) throws VirtException {
 		checkConnected();
 		try {
 			log.debug("Pausing domain {}.", domainId);
 			Domain d = connection.domainLookupByID(domainId);
 			d.suspend();
-			return new Pair<Boolean, String>(Boolean.TRUE, "Domain paused.");
 		} catch (LibvirtException le) {
 			log.error(String.format("Could not pause domain %d.", domainId), le);
-			return new Pair<Boolean, String>(Boolean.FALSE, le.getMessage());
+			throw new VirtException(String.format("Could not pause domain %d.", domainId), le);
 		}
 	}
 
@@ -376,16 +372,15 @@ public class VirtManager implements Serializable {
 	 * @param domainId
 	 * @return
 	 */
-	public Pair<Boolean, String> shutdown(Integer domainId) {
+	public void shutdown(Integer domainId) throws VirtException {
 		checkConnected();
 		try {
 			log.debug("Shutting down domain {}.", domainId);
 			Domain d = connection.domainLookupByID(domainId);
 			d.shutdown();
-			return new Pair<Boolean, String>(Boolean.TRUE, "Domain shutdown.");
 		} catch (LibvirtException le) {
 			log.error(String.format("Could not shutdown domain %d.", domainId), le);
-			return new Pair<Boolean, String>(Boolean.FALSE, le.getMessage());
+			throw new VirtException(String.format("Could not shutdown domain %d.", domainId), le);
 		}
 	}
 
@@ -394,16 +389,15 @@ public class VirtManager implements Serializable {
 	 * @param domainId
 	 * @return
 	 */
-	public Pair<Boolean, String> destroy(Integer domainId) {
+	public void destroy(Integer domainId) throws VirtException {
 		checkConnected();
 		try {
 			log.debug("Destroying domain {}.", domainId);
 			Domain d = connection.domainLookupByID(domainId);
 			d.destroy();
-			return new Pair<Boolean, String>(Boolean.TRUE, "Domain nuked.");
 		} catch (LibvirtException le) {
 			log.error(String.format("Could not destroy domain %d.", domainId), le);
-			return new Pair<Boolean, String>(Boolean.FALSE, le.getMessage());
+			throw new VirtException(String.format("Could not destroy domain %d.", domainId), le);
 		}
 	}
 	
@@ -412,9 +406,15 @@ public class VirtManager implements Serializable {
 	 * @return
 	 * @throws VirtException
 	 */
-	public List<String> getStoragePools() throws VirtException {
+	public List<InternalStoragePool> getStoragePools() throws VirtException {
+		checkConnected();
 		try {
-			return Arrays.asList(connection.listStoragePools());
+			List<InternalStoragePool> pools = new ArrayList<InternalStoragePool>();
+			for (String poolName : connection.listStoragePools()) {
+				final StoragePool pool = connection.storagePoolLookupByName(poolName);
+				pools.add(new InternalStoragePool(pool.getName(), pool.getUUIDString(), pool.numOfVolumes(), pool.getInfo().state, pool.getInfo().capacity, pool.getInfo().available, pool.getAutostart()));
+			}
+			return pools;
 		} catch (LibvirtException le) {
 			throw new VirtException("Could not retrieve list of storage pools.", le);
 		}
@@ -426,9 +426,11 @@ public class VirtManager implements Serializable {
 	 * @return
 	 * @throws VirtException
 	 */
-	public StoragePool getStoragePool(String name) throws VirtException {
+	public InternalStoragePool getStoragePool(String name) throws VirtException {
+		checkConnected();
 		try {
-			return connection.storagePoolLookupByName(name);
+			final StoragePool pool = connection.storagePoolLookupByName(name);
+			return new InternalStoragePool(pool.getName(), pool.getUUIDString(), pool.numOfVolumes(), pool.getInfo().state, pool.getInfo().capacity, pool.getInfo().available, pool.getAutostart());
 		} catch (LibvirtException le) {
 			throw new VirtException("Could not retrieve storage pool.", le);
 		}
@@ -440,6 +442,7 @@ public class VirtManager implements Serializable {
 	 * @throws VirtException
 	 */
 	public List<String> getNetworks() throws VirtException {
+		checkConnected();
 		try {
 			return Arrays.asList(connection.listNetworks());
 		} catch (LibvirtException le) {
@@ -454,6 +457,7 @@ public class VirtManager implements Serializable {
 	 * @throws VirtException
 	 */
 	public Network getNetwork(String name) throws VirtException {
+		checkConnected();
 		try {
 			return connection.networkLookupByName(name);
 		} catch (LibvirtException le) {

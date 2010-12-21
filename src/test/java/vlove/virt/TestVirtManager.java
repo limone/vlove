@@ -46,7 +46,7 @@ public class TestVirtManager {
 	}
 
 	@Test
-	public void testGetDomains() {
+	public void testGetDomains() throws VirtException {
 		vm.init("qemu+unix:///system");
 		if (vm.connect()) {
 			List<InternalDomain> domains = vm.getDomains();

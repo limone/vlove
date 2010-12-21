@@ -16,16 +16,15 @@ import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.libvirt.StoragePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import vlove.VirtException;
+import vlove.model.InternalStoragePool;
 import vlove.virt.VirtManager;
 
 import com.sun.management.OperatingSystemMXBean;
 
-@SuppressWarnings("restriction")
 public class Step2Hardware extends WizardStep {
 	transient final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -59,12 +58,12 @@ public class Step2Hardware extends WizardStep {
 		add(new Label("totalProcs", Integer.toString(numProcs)));
 		add(new Label("totalMem", Long.toString(totalMem)));
 
-		List<String> storagePools = null;
+		List<InternalStoragePool> storagePools = null;
 		try {
 			storagePools = vm.getStoragePools();
 		} catch (VirtException ve) {
 			log.error("Could not list storage pools.", ve);
-			storagePools = new ArrayList<String>();
+			storagePools = new ArrayList<InternalStoragePool>();
 			// TODO - this should actually bomb out to an error page, as this screws
 			// the whole process
 		}
@@ -75,15 +74,15 @@ public class Step2Hardware extends WizardStep {
 		sCont.add(new Label("totalDisk", Long.toString(0)).setOutputMarkupId(true));
 		sCont.add(new RequiredTextField<Integer>("diskSize").setMarkupId("diskSize").setOutputMarkupId(true));
 
-		final DropDownChoice<String> ddStorage = new DropDownChoice<String>("storagePools", storagePools, new IChoiceRenderer<String>() {
+		final DropDownChoice<InternalStoragePool> ddStorage = new DropDownChoice<InternalStoragePool>("storagePool", storagePools, new IChoiceRenderer<InternalStoragePool>() {
 			@Override
-			public Object getDisplayValue(String object) {
-				return object;
+			public Object getDisplayValue(InternalStoragePool object) {
+				return object.getName();
 			}
 
 			@Override
-			public String getIdValue(String object, int index) {
-				return object;
+			public String getIdValue(InternalStoragePool object, int index) {
+				return object.getUuid();
 			}
 		});
 		
@@ -93,8 +92,8 @@ public class Step2Hardware extends WizardStep {
 				final String sPool = getFormComponent().getValue();
 				log.debug("Looking for storage pool {}.", sPool);
 				try {
-					StoragePool sp = vm.getStoragePool(sPool);
-					final long maxDisk = sp.getInfo().available / 1024 / 1024 / 1024;
+					InternalStoragePool sp = vm.getStoragePool(sPool);
+					final long maxDisk = sp.getAvailable() / 1024 / 1024 / 1024;
 
 					// Update the label with the real value
 					Label newTotalDisk = new Label("totalDisk", Long.toString(maxDisk));

@@ -18,6 +18,7 @@
 			<tr>
 				<th style="width:100px">name</th>
 				<th style="width:100px">id</th>
+				<th style="width:100px">autostart</th>
 				<th style="width:100px">status</th>
 				<th style="width:100px">cpu usage</th>
 				<th style="width:150px">memory usage</th>
@@ -28,6 +29,7 @@
 			<tr wicket:id="repeater">
 				<td><wicket:container wicket:id="name" /></td>
 				<td><wicket:container wicket:id="domainId" /><input type="hidden" wicket:id="uuid" /></td>
+				<td>&nbsp;</td>
 				<td><img wicket:id="statusImage" alt="" />&nbsp;<wicket:container wicket:id="status" /></td>
 				<td><span wicket:id="cpuUsage" /></td>
 				<td><span wicket:id="memoryUsage" /></td>
