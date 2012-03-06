@@ -30,35 +30,35 @@ import vlove.model.ConfigItem;
 
 @Repository
 public class ConfigDaoImpl implements ConfigDao {
-	@Autowired
-	private GenericDao gd;
-	
-	public ConfigDaoImpl() {
-		// empty
-	}
-	
-	/**
-	 * @see vlove.dao.ConfigDao#getConfigItem(String)
-	 */
-	@Override
-	public ConfigItem getConfigItem(String key) {
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("key", key);
-		final ConfigItem configItem = gd.namedQuerySingle("ConfigItem.GetByKey", params);
-		return configItem == null ? new ConfigItem(key, null) : configItem;
-	}
+  @Autowired
+  private GenericDao gd;
 
-	/**
-	 * @see vlove.dao.ConfigDao#saveConfigItem(ConfigItem)
-	 */
-	@Override
-	public void saveConfigItem(ConfigItem item) {
-		ConfigItem tmp = getConfigItem(item.getKey());
-		if (tmp == null) {
-			gd.persist(item);
-		} else {
-			tmp.setValue(item.getValue());
-			gd.merge(tmp);
-		}
-	}
+  public ConfigDaoImpl() {
+    // empty
+  }
+
+  /**
+   * @see vlove.dao.ConfigDao#getConfigItem(String)
+   */
+  @Override
+  public ConfigItem getConfigItem(String key) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("key", key);
+    final ConfigItem configItem = gd.namedQuerySingle("ConfigItem.GetByKey", params);
+    return configItem == null ? new ConfigItem(key, null) : configItem;
+  }
+
+  /**
+   * @see vlove.dao.ConfigDao#saveConfigItem(ConfigItem)
+   */
+  @Override
+  public void saveConfigItem(ConfigItem item) {
+    ConfigItem tmp = getConfigItem(item.getKey());
+    if (tmp == null) {
+      gd.persist(item);
+    } else {
+      tmp.setValue(item.getValue());
+      gd.merge(tmp);
+    }
+  }
 }

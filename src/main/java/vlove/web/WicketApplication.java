@@ -19,13 +19,14 @@
 package vlove.web;
 
 import org.apache.wicket.Page;
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.time.Duration;
 import org.apache.wicket.util.watch.ModificationWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.wicketstuff.annotation.scan.AnnotatedMountScanner;
 
 /**
@@ -34,51 +35,54 @@ import org.wicketstuff.annotation.scan.AnnotatedMountScanner;
  * @author Michael Laccetti
  */
 public class WicketApplication extends WebApplication {
-	private static final Logger log = LoggerFactory.getLogger(WicketApplication.class);
-	
-	public WicketApplication() {
-		// empty
-	}
-	
-	/**
-	 * Do all our deploy-time magic.
-	 * 
-	 * @See {@link WebApplication}
-	 */
-	@Override
-	protected void init() {
-		log.info("vlove coming alive.");
-		super.init();
-		
-		addComponentInstantiationListener(new SpringComponentInjector(this));
-		InjectorHolder.getInjector().inject(this);
-		new AnnotatedMountScanner().scanPackage("vlove.web").mount(this);
+  private static final Logger log = LoggerFactory.getLogger(WicketApplication.class);
 
-		/*getApplicationSettings().setAccessDeniedPage(AccessDeniedPage.class);
-		getApplicationSettings().setInternalErrorPage(ErrorPage.class);
-		getApplicationSettings().setPageExpiredErrorPage(PageExpiredPage.class);*/
-		
-		getMarkupSettings().setStripComments(true);
-		getMarkupSettings().setStripWicketTags(true);
-		getMarkupSettings().setStripXmlDeclarationFromOutput(true);
-		
-		final String devType = getConfigurationType();
-		if (devType != null && devType == DEVELOPMENT) {
-			getResourceSettings().setResourceWatcher(new ModificationWatcher());
-			getResourceSettings().setResourcePollFrequency(Duration.seconds(1));
-		}
+  public WicketApplication() {
+    // empty
+  }
 
-		// getSecuritySettings().setAuthorizationStrategy(new AcsAnnotationAuthorizationStrategy(getLoginPage()));
-		getSecuritySettings().setEnforceMounts(true);
-		
-		log.info("It's alive, aliiiiiive!");
-	}
+  /**
+   * Do all our deploy-time magic.
+   * 
+   * @See {@link WebApplication}
+   */
+  @Override
+  protected void init() {
+    SLF4JBridgeHandler.install();
+    
+    log.info("vlove coming alive.");
+    super.init();
 
-	/**
-	 * @see {@link WebApplication#getHomePage()}
-	 */
-	@Override
-	public Class<? extends Page> getHomePage() {
-		return HomePage.class;
-	}
+    getComponentInstantiationListeners().add(new SpringComponentInjector(this));
+    new AnnotatedMountScanner().scanPackage("vlove.web").mount(this);
+    
+    /*
+     * getApplicationSettings().setAccessDeniedPage(AccessDeniedPage.class);
+     * getApplicationSettings().setInternalErrorPage(ErrorPage.class);
+     * getApplicationSettings().setPageExpiredErrorPage(PageExpiredPage.class);
+     */
+
+    getMarkupSettings().setStripComments(true);
+    getMarkupSettings().setStripWicketTags(true);
+
+    final RuntimeConfigurationType devType = getConfigurationType();
+    if (devType != null && devType.equals(RuntimeConfigurationType.DEVELOPMENT)) {
+      getResourceSettings().setResourceWatcher(new ModificationWatcher());
+      getResourceSettings().setResourcePollFrequency(Duration.seconds(1));
+    }
+
+    // getSecuritySettings().setAuthorizationStrategy(new
+    // AcsAnnotationAuthorizationStrategy(getLoginPage()));
+    getSecuritySettings().setEnforceMounts(true);
+
+    log.info("It's alive, aliiiiiive!");
+  }
+
+  /**
+   * @see {@link WebApplication#getHomePage()}
+   */
+  @Override
+  public Class<? extends Page> getHomePage() {
+    return HomePage.class;
+  }
 }

@@ -19,59 +19,59 @@ import vlove.VirtException;
 import vlove.virt.VirtManager;
 
 public class Step3Network extends WizardStep {
-	transient final Logger log = LoggerFactory.getLogger(getClass());
+  transient final Logger log = LoggerFactory.getLogger(getClass());
 
-	@SpringBean
-	VirtManager vm;
+  @SpringBean
+  VirtManager            vm;
 
-	public Step3Network() {
-		List<String> networks = new ArrayList<String>();
-		try {
-			networks.add("manual");
-			networks.addAll(vm.getNetworks());
-		} catch (VirtException ve) {
-			log.error("Could not retrieve networks.", ve);
-			// TODO bomb out properly
-		}
-		
-		final WebMarkupContainer bridgeCont = new WebMarkupContainer("bridgeContainer");
-		add(bridgeCont.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
-		
-		bridgeCont.add(new RequiredTextField<String>("bridge"));
+  public Step3Network() {
+    List<String> networks = new ArrayList<>();
+    try {
+      networks.add("manual");
+      networks.addAll(vm.getNetworks());
+    } catch (VirtException ve) {
+      log.error("Could not retrieve networks.", ve);
+      // TODO bomb out properly
+    }
 
-		final DropDownChoice<String> ddNetworks = new DropDownChoice<String>("networks", networks, new IChoiceRenderer<String>() {
-			@Override
-			public Object getDisplayValue(String object) {
-				return object;
-			}
+    final WebMarkupContainer bridgeCont = new WebMarkupContainer("bridgeContainer");
+    add(bridgeCont.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
 
-			@Override
-			public String getIdValue(String object, int index) {
-				return object;
-			}
-		});
+    bridgeCont.add(new RequiredTextField<String>("bridge"));
 
-		ddNetworks.add(new OnChangeAjaxBehavior() {
-			@Override
-			protected void onUpdate(AjaxRequestTarget target) {
-				try {
-					final String network = getFormComponent().getValue();
-					if (network == null || network.length() == 0) { return; }
+    final DropDownChoice<String> ddNetworks = new DropDownChoice<>("networks", networks, new IChoiceRenderer<String>() {
+      @Override
+      public Object getDisplayValue(String object) {
+        return object;
+      }
 
-					if (network.equalsIgnoreCase("manual")) {
-						// Pop up the text field asking for the bridge
-						target.addComponent(bridgeCont.setVisible(true));
-					} else {
-						target.addComponent(bridgeCont.setVisible(false));
-						Network n = vm.getNetwork(network);
-						log.debug("Bridge name: {}", n.getBridgeName());
-					}
-				} catch (Exception ex) {
-					log.error("Could not process selected network.", ex);
-					// TODO bomb out
-				}
-			}
-		});
-		add(ddNetworks.setRequired(true));
-	}
+      @Override
+      public String getIdValue(String object, int index) {
+        return object;
+      }
+    });
+
+    ddNetworks.add(new OnChangeAjaxBehavior() {
+      @Override
+      protected void onUpdate(AjaxRequestTarget target) {
+        try {
+          final String network = getFormComponent().getValue();
+          if (network == null || network.length() == 0) { return; }
+
+          if (network.equalsIgnoreCase("manual")) {
+            // Pop up the text field asking for the bridge
+            target.add(bridgeCont.setVisible(true));
+          } else {
+            target.add(bridgeCont.setVisible(false));
+            Network n = vm.getNetwork(network);
+            log.debug("Bridge name: {}", n.getBridgeName());
+          }
+        } catch (Exception ex) {
+          log.error("Could not process selected network.", ex);
+          // TODO bomb out
+        }
+      }
+    });
+    add(ddNetworks.setRequired(true));
+  }
 }

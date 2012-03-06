@@ -1,3 +1,0 @@
-<atmosphere-handlers>
-	<atmosphere-handler context-root="/boo" class-name="vlove.web.test.SampleHandler" />
-</atmosphere-handlers> 

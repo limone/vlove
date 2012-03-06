@@ -19,27 +19,27 @@ import vlove.model.ConfigItem;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/spring-config.xml")
 @Transactional
-@TransactionConfiguration(defaultRollback=false)
+@TransactionConfiguration(defaultRollback = false)
 public class SetupTool {
-	private transient final Logger log = LoggerFactory.getLogger(getClass());
-	
-	@Autowired
-	private ConfigDao cd;
-	
-	@Test
-	public void populateConfig() {
-		log.debug("Creating vlove URL.");
-		ConfigItem vloveUrl = new ConfigItem("libvirt.url", "qemu:///session");
-		cd.saveConfigItem(vloveUrl);
-		log.debug("vlove URL saved.");
-	}
-	
-	@Test
-	@After("populateConfig")
-	public void checkConfig() {
-		log.debug("Checking for vlove URL.");
-		ConfigItem vloveUrl = cd.getConfigItem("libvirt.url");
-		assertNotNull("Config item not found.", vloveUrl);
-		assertNotNull("Config item found, but value was empty.", vloveUrl.getValue());
-	}
+  private transient final Logger log = LoggerFactory.getLogger(getClass());
+
+  @Autowired
+  private ConfigDao              cd;
+
+  @Test
+  public void populateConfig() {
+    log.debug("Creating vlove URL.");
+    ConfigItem vloveUrl = new ConfigItem("libvirt.url", "test:///default");
+    cd.saveConfigItem(vloveUrl);
+    log.debug("vlove URL saved.");
+  }
+
+  @Test
+  @After("populateConfig")
+  public void checkConfig() {
+    log.debug("Checking for vlove URL.");
+    ConfigItem vloveUrl = cd.getConfigItem("libvirt.url");
+    assertNotNull("Config item not found.", vloveUrl);
+    assertNotNull("Config item found, but value was empty.", vloveUrl.getValue());
+  }
 }

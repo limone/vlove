@@ -29,7 +29,7 @@ import vlove.model.Capabilities;
  * 
  * @author Michael Laccetti
  */
-@MountPath(path="/home")
+@MountPath("/home")
 public class HomePage extends BasePage {
 	
 	public HomePage() {

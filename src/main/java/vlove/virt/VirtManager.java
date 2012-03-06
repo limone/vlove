@@ -21,8 +21,6 @@ package vlove.virt;
 import java.io.File;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,410 +56,426 @@ import com.sun.management.OperatingSystemMXBean;
  * 
  * @author Michael Laccetti
  */
+@SuppressWarnings("restriction")
 @Service
 public class VirtManager implements Serializable {
-	private transient final Logger log = LoggerFactory.getLogger(getClass());
-	private boolean isConnected = false;
+  private static final Logger log         = LoggerFactory.getLogger(VirtManager.class);
+  private boolean                isConnected = false;
 
-	@Autowired
-	private ConfigDao cd;
+  @Autowired
+  private ConfigDao              cd;
 
-	// Connection information
-	private String libvirtUrl;
-	private Connect connection;
+  // Connection information
+  private String                 libvirtUrl;
+  private Connect                connection;
 
-	// MBean
-	private OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+  // MBean
+  private OperatingSystemMXBean  osBean      = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
-	public VirtManager() {
-		// empty, for Spring
-	}
+  public VirtManager() {
+    // empty, for Spring
+  }
 
-	private void checkConnected() {
-		if (!isConnected) {
-			log.error("Not connected to libvirt, failing operation.");
-			throw new RuntimeException("Not connected to libvirt, failing operation.");
-		}
-	}
+  private void checkConnected() {
+    if (!isConnected) {
+      log.error("Not connected to libvirt, failing operation.");
+      throw new RuntimeException("Not connected to libvirt, failing operation.");
+    }
+  }
 
-	/**
-	 * Post-constructor init method - connects to libvirt.
-	 */
-	@PostConstruct
-	public void init() {
-		final String os = System.getProperty("os.name");
-		log.debug("Loading driver for OS: {}", os);
+  /**
+   * Post-constructor init method - connects to libvirt.
+   */
+  @PostConstruct
+  public void init() {
+    System.setProperty("jna.library.path", "C:/Tools/dev/libvirt/bin");
+    System.setProperty("java.library.path", "C:/Tools/dev/libvirt/bin");
+    
+    final String os = System.getProperty("os.name");
+    log.debug("Loading driver for OS: {}", os);
 
-		if (os != null && os.toLowerCase().contains("windows")) {
-			final URL resource = getClass().getResource("/libvirt-0.dll");
-			if (resource != null) {
-				try {
-					System.load(resource.toURI().getPath());
-				} catch (URISyntaxException use) {
-					log.warn("Could not parse URI path for libvirt.dll.");
-					throw new RuntimeException("Could not parse URI path for libvirt.dll.");
-				}
-			} else {
-				throw new RuntimeException("Could not load libvirt.dll.");
-			}
-		} else if (os != null && os.toLowerCase().contains("linux")) {
-			final String driver = "/usr/lib/libvirt.so.0";
-			if (new File(driver).exists()) {
-				System.load(driver);
-			} else {
-				throw new RuntimeException("Could not load /usr/lib/libvirt.so.0.");
-			}
-		}
+    String driver = null;
+    if (os != null && os.toLowerCase().contains("windows")) {
+      driver = "C:/Tools/dev/libvirt/bin/libvirt-0.dll";
+    } else if (os != null && os.toLowerCase().contains("linux")) {
+      driver = "/usr/lib/libvirt.so.0";
+    }
+    
+    if (new File(driver).exists()) {
+      System.load(driver);
+    } else {
+      throw new RuntimeException(String.format("Could not load driver from %s.", driver));
+    }
 
-		// Set the default URL
-		libvirtUrl = cd.getConfigItem("libvirt.url").getValue();
-		if (libvirtUrl == null || libvirtUrl.length() == 0) {
-			log.warn("No libvirt URL defined, setting to default: qemu:///session");
-			libvirtUrl = "qemu:///session";
-		}
-	}
+    // Set the default URL
+    libvirtUrl = cd.getConfigItem("libvirt.url").getValue();
+    if (libvirtUrl == null || libvirtUrl.length() == 0) {
+      log.warn("No libvirt URL defined, setting to default: test:///default");
+      libvirtUrl = "test:///default";
+    }
+  }
 
-	/**
-	 * Used to rebuild the connection to libvirt on the fly.
-	 * 
-	 * @param newLibvirtUrl
-	 *          URL for libvirt
-	 */
-	public void init(String newLibvirtUrl) {
-		cd.saveConfigItem(new ConfigItem("libvirt.url", newLibvirtUrl));
-		init();
-	}
+  /**
+   * Used to rebuild the connection to libvirt on the fly.
+   * 
+   * @param newLibvirtUrl
+   *          URL for libvirt
+   */
+  public void init(String newLibvirtUrl) {
+    cd.saveConfigItem(new ConfigItem("libvirt.url", newLibvirtUrl));
+    init();
+  }
 
-	/**
-	 * Doesn't shut down a VM, but the VirtManager itself.
-	 */
-	@PreDestroy
-	public void shutdown() {
-		disconnect();
-	}
+  /**
+   * Doesn't shut down a VM, but the VirtManager itself.
+   */
+  @PreDestroy
+  public void shutdown() {
+    disconnect();
+  }
 
-	/**
-	 * Check to see if we are connected to libvirt.
-	 * @return
-	 */
-	public boolean isConnected() {
-		return isConnected;
-	}
+  /**
+   * Check to see if we are connected to libvirt.
+   * 
+   * @return
+   */
+  public boolean isConnected() {
+    return isConnected;
+  }
 
-	/**
-	 * Check to make sure that all of the configuration variables have been set.
-	 * @return
-	 */
-	public boolean validateConfig() {
-		log.debug("Validating config.");
-		if (cd.getConfigItem("libvirt.url").getValue() == null || cd.getConfigItem("vmbuilder.location").getValue() == null) {
-			log.warn("One of the configuration options was missing.");
-			return false;
-		}
-		log.debug("Configuration was fine.");
-		return true;
-	}
+  /**
+   * Check to make sure that all of the configuration variables have been set.
+   * 
+   * @return
+   */
+  public boolean validateConfig() {
+    log.debug("Validating config.");
+    if (cd.getConfigItem("libvirt.url").getValue() == null || cd.getConfigItem("vmbuilder.location").getValue() == null) {
+      log.warn("One of the configuration options was missing.");
+      return false;
+    }
+    log.debug("Configuration was fine.");
+    return true;
+  }
 
-	/**
-	 * Connect to libvirt
-	 * @param restart If true, reload the libvirt URL from the configuration system.
-	 * @return
-	 */
-	public boolean connect(boolean restart) {
-		if (restart) {
-			libvirtUrl = cd.getConfigItem("libvirt.url").getValue();
-		}
-		return connect();
-	}
+  /**
+   * Connect to libvirt
+   * 
+   * @param restart
+   *          If true, reload the libvirt URL from the configuration system.
+   * @return
+   */
+  public boolean connect(boolean restart) {
+    if (restart) {
+      libvirtUrl = cd.getConfigItem("libvirt.url").getValue();
+    }
+    return connect();
+  }
 
-	/**
-	 * Connect to libvirt using the URL pulled out during the init() process.
-	 * @return
-	 */
-	public boolean connect() {
-		try {
-			log.debug("Attempting connection to {}.", libvirtUrl);
-			connection = new Connect(libvirtUrl);
-			isConnected = true;
-			log.debug("Connected to libvirt.");
-			return true;
-		} catch (LibvirtException le) {
-			log.error("Could not connect to libvirt.", le);
-			return false;
-		}
-	}
+  /**
+   * Connect to libvirt using the URL pulled out during the init() process.
+   * 
+   * @return
+   */
+  public boolean connect() {
+    try {
+      log.debug("Attempting connection to {}.", libvirtUrl);
+      connection = new Connect(libvirtUrl);
+      isConnected = true;
+      log.debug("Connected to libvirt.");
+      return true;
+    } catch (LibvirtException le) {
+      log.error("Could not connect to libvirt.", le);
+      return false;
+    }
+  }
 
-	/**
-	 * Disconnect from libvirt.
-	 */
-	public void disconnect() {
-		if (isConnected) {
-			try {
-				log.debug("Disconnecting from libvirt.");
-				connection.close();
-			} catch (LibvirtException le) {
-				log.warn("Could not close connection to libvirt.", le);
-			}
-			isConnected = false;
-		} else {
-			log.info("Not connected to libvirt, no need to disconnect.");
-		}
-	}
+  /**
+   * Disconnect from libvirt.
+   */
+  public void disconnect() {
+    if (isConnected) {
+      try {
+        log.debug("Disconnecting from libvirt.");
+        connection.close();
+      } catch (LibvirtException le) {
+        log.warn("Could not close connection to libvirt.", le);
+      }
+      isConnected = false;
+    } else {
+      log.info("Not connected to libvirt, no need to disconnect.");
+    }
+  }
 
-	/**
-	 * Retrieve the hardware capabilities of the host that libvirt is runnign on.
-	 * @return
-	 * @throws VirtException
-	 */
-	public Capabilities getCapabilities() throws VirtException {
-		checkConnected();
+  /**
+   * Retrieve the hardware capabilities of the host that libvirt is runnign on.
+   * 
+   * @return
+   * @throws VirtException
+   */
+  public Capabilities getCapabilities() throws VirtException {
+    checkConnected();
 
-		Capabilities c = new Capabilities();
+    Capabilities c = new Capabilities();
 
-		try {
-			final String capabilities = connection.getCapabilities();
-			Document d = XPathUtils.loadDocument(capabilities.getBytes());
-			c.setCpuArch(((String) XPathUtils.parseXPathExpression(d, "/capabilities/host/cpu/arch", XPathConstants.STRING)));
-			c.setModel(((String) XPathUtils.parseXPathExpression(d, "/capabilities/host/cpu/model", XPathConstants.STRING)));
-			c.setVendor(((String) XPathUtils.parseXPathExpression(d, "/capabilities/host/cpu/vendor", XPathConstants.STRING)));
+    try {
+      final String capabilities = connection.getCapabilities();
+      Document d = XPathUtils.loadDocument(capabilities.getBytes());
+      c.setCpuArch(((String) XPathUtils.parseXPathExpression(d, "/capabilities/host/cpu/arch", XPathConstants.STRING)));
+      c.setModel(((String) XPathUtils.parseXPathExpression(d, "/capabilities/host/cpu/model", XPathConstants.STRING)));
+      c.setVendor(((String) XPathUtils.parseXPathExpression(d, "/capabilities/host/cpu/vendor", XPathConstants.STRING)));
 
-			// To be added later, just dump it to the log for now:
-			Node t = (Node) XPathUtils.parseXPathExpression(d, "/capabilities/host/cpu/topology", XPathConstants.NODE);
-			Integer sockets = Integer.parseInt(t.getAttributes().getNamedItem("sockets").getNodeValue());
-			Integer cores = Integer.parseInt(t.getAttributes().getNamedItem("cores").getNodeValue());
-			Integer threads = Integer.parseInt(t.getAttributes().getNamedItem("threads").getNodeValue());
+      // To be added later, just dump it to the log for now:
+      Node t = (Node) XPathUtils.parseXPathExpression(d, "/capabilities/host/cpu/topology", XPathConstants.NODE);
+      Integer sockets = Integer.parseInt(t.getAttributes().getNamedItem("sockets").getNodeValue());
+      Integer cores = Integer.parseInt(t.getAttributes().getNamedItem("cores").getNodeValue());
+      Integer threads = Integer.parseInt(t.getAttributes().getNamedItem("threads").getNodeValue());
 
-			// log.debug("Topology - sockets: {}, cores: {}, threads: {}", new Object[] { sockets, cores, threads });
-			c.setNumProcs(sockets * cores * threads);
-		} catch (LibvirtException le) {
-			log.error("Could not retrieve capabilities from libvirt.", le);
-			throw new VirtException("Could not retrieve capabilities from libvirt.", le);
-		}
+      // log.debug("Topology - sockets: {}, cores: {}, threads: {}", new
+      // Object[] { sockets, cores, threads });
+      c.setNumProcs(sockets * cores * threads);
+    } catch (LibvirtException le) {
+      log.error("Could not retrieve capabilities from libvirt.", le);
+      throw new VirtException("Could not retrieve capabilities from libvirt.", le);
+    }
 
-		return c;
-	}
+    return c;
+  }
 
-	/**
-	 * Retrieve all the VMs defined.
-	 * @return
-	 */
-	public List<InternalDomain> getDomains() throws VirtException {
-		checkConnected();
-		try {
-			List<InternalDomain> domains = new ArrayList<InternalDomain>();
-			for (int did : connection.listDomains()) {
-				Domain d = connection.domainLookupByID(did);
-				domains.add(new InternalDomain(did, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
-			}
+  /**
+   * Retrieve all the VMs defined.
+   * 
+   * @return
+   */
+  public List<InternalDomain> getDomains() throws VirtException {
+    checkConnected();
+    try {
+      List<InternalDomain> domains = new ArrayList<>();
+      for (int did : connection.listDomains()) {
+        Domain d = connection.domainLookupByID(did);
+        domains.add(new InternalDomain(did, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
+      }
 
-			for (String domainName : connection.listDefinedDomains()) {
-				Domain d = connection.domainLookupByName(domainName);
-				domains.add(new InternalDomain(0, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
-			}
-			return domains;
-		} catch (LibvirtException le) {
-			log.error("Could not list domains.", le);
-			throw new VirtException("Could not list domains.", le);
-		}
-	}
+      for (String domainName : connection.listDefinedDomains()) {
+        Domain d = connection.domainLookupByName(domainName);
+        domains.add(new InternalDomain(0, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
+      }
+      return domains;
+    } catch (LibvirtException le) {
+      log.error("Could not list domains.", le);
+      throw new VirtException("Could not list domains.", le);
+    }
+  }
 
-	/**
-	 * Retrieve a specific VM, by numeric ID.
-	 * @param domainId
-	 * @return
-	 * @throws VirtException
-	 */
-	public InternalDomain getDomain(Integer domainId) throws VirtException {
-		checkConnected();
-		try {
-			Domain d = connection.domainLookupByID(domainId);
-			return new InternalDomain(domainId, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
-		} catch (LibvirtException le) {
-			throw new VirtException(String.format("Could not retrieve domain for ID %d.", domainId));
-		}
-	}
+  /**
+   * Retrieve a specific VM, by numeric ID.
+   * 
+   * @param domainId
+   * @return
+   * @throws VirtException
+   */
+  public InternalDomain getDomain(Integer domainId) throws VirtException {
+    checkConnected();
+    try {
+      Domain d = connection.domainLookupByID(domainId);
+      return new InternalDomain(domainId, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
+    } catch (LibvirtException le) {
+      throw new VirtException(String.format("Could not retrieve domain for ID %d.", domainId));
+    }
+  }
 
-	/**
-	 * Retrieve a specific VM, by name.
-	 * @param domainName
-	 * @return
-	 * @throws VirtException
-	 */
-	public InternalDomain getDomain(String domainName) throws VirtException {
-		checkConnected();
-		try {
-			Domain d = connection.domainLookupByName(domainName);
-			return new InternalDomain(d.getID(), d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
-		} catch (LibvirtException le) {
-			throw new VirtException(String.format("Could not retrieve domain for name %s.", domainName), le);
-		}
-	}
-	
-	/**
-	 * Retrieve a specific VM, by UUID.
-	 * @param uuid
-	 * @return
-	 * @throws VirtException
-	 */
-	public InternalDomain getDomainByUUID(String uuid) throws VirtException{
-		try {
-			Domain d = connection.domainLookupByUUIDString(uuid);
-			return new InternalDomain(d.getID(), d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
-		} catch (LibvirtException le) {
-			throw new VirtException(String.format("Could not retrieve domain for UUID %s.", uuid));
-		}
-	}
+  /**
+   * Retrieve a specific VM, by name.
+   * 
+   * @param domainName
+   * @return
+   * @throws VirtException
+   */
+  public InternalDomain getDomain(String domainName) throws VirtException {
+    checkConnected();
+    try {
+      Domain d = connection.domainLookupByName(domainName);
+      return new InternalDomain(d.getID(), d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
+    } catch (LibvirtException le) {
+      throw new VirtException(String.format("Could not retrieve domain for name %s.", domainName), le);
+    }
+  }
 
-	/**
-	 * Start a VM up.
-	 * @param domainName
-	 * @return
-	 */
-	// TODO convert from a PAIR to a TRIPLE so that we can capture the error
-	// message, if any
-	public Integer start(String domainName) throws VirtException {
-		checkConnected();
-		try {
-			Domain d = connection.domainLookupByName(domainName);
-			log.debug("Starting domain {}.", domainName);
-			d.create();
-			d = connection.domainLookupByName(domainName);
-			return d.getID();
-		} catch (LibvirtException le) {
-			log.error(String.format("Could not start domain %s.", domainName), le);
-			throw new VirtException(String.format("Could not start domain %s.", domainName), le);
-		}
-	}
+  /**
+   * Retrieve a specific VM, by UUID.
+   * 
+   * @param uuid
+   * @return
+   * @throws VirtException
+   */
+  public InternalDomain getDomainByUUID(String uuid) throws VirtException {
+    try {
+      Domain d = connection.domainLookupByUUIDString(uuid);
+      return new InternalDomain(d.getID(), d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
+    } catch (LibvirtException le) {
+      throw new VirtException(String.format("Could not retrieve domain for UUID %s.", uuid));
+    }
+  }
 
-	/**
-	 * Resume a paused VM.
-	 * @param domainId
-	 * @return
-	 */
-	public void resume(Integer domainId) throws VirtException {
-		checkConnected();
-		try {
-			Domain d = connection.domainLookupByID(domainId);
-			log.debug("Resuming domain {}.", domainId);
-			d.resume();
-		} catch (LibvirtException le) {
-			log.error(String.format("Could not resume domain %d.", domainId), le);
-			throw new VirtException(String.format("Could not resume domain %d.", domainId), le);
-		}
-	}
+  /**
+   * Start a VM up.
+   * 
+   * @param domainName
+   * @return
+   */
+  // TODO convert from a PAIR to a TRIPLE so that we can capture the error
+  // message, if any
+  public Integer start(String domainName) throws VirtException {
+    checkConnected();
+    try {
+      Domain d = connection.domainLookupByName(domainName);
+      log.debug("Starting domain {}.", domainName);
+      d.create();
+      d = connection.domainLookupByName(domainName);
+      return d.getID();
+    } catch (LibvirtException le) {
+      log.error(String.format("Could not start domain %s.", domainName), le);
+      throw new VirtException(String.format("Could not start domain %s.", domainName), le);
+    }
+  }
 
-	/**
-	 * Pause a running VM.
-	 * @param domainId
-	 * @return
-	 */
-	public void pause(Integer domainId) throws VirtException {
-		checkConnected();
-		try {
-			log.debug("Pausing domain {}.", domainId);
-			Domain d = connection.domainLookupByID(domainId);
-			d.suspend();
-		} catch (LibvirtException le) {
-			log.error(String.format("Could not pause domain %d.", domainId), le);
-			throw new VirtException(String.format("Could not pause domain %d.", domainId), le);
-		}
-	}
+  /**
+   * Resume a paused VM.
+   * 
+   * @param domainId
+   * @return
+   */
+  public void resume(Integer domainId) throws VirtException {
+    checkConnected();
+    try {
+      Domain d = connection.domainLookupByID(domainId);
+      log.debug("Resuming domain {}.", domainId);
+      d.resume();
+    } catch (LibvirtException le) {
+      log.error(String.format("Could not resume domain %d.", domainId), le);
+      throw new VirtException(String.format("Could not resume domain %d.", domainId), le);
+    }
+  }
 
-	/**
-	 * Send the ACPI shutdown command to a running VM.
-	 * @param domainId
-	 * @return
-	 */
-	public void shutdown(Integer domainId) throws VirtException {
-		checkConnected();
-		try {
-			log.debug("Shutting down domain {}.", domainId);
-			Domain d = connection.domainLookupByID(domainId);
-			d.shutdown();
-		} catch (LibvirtException le) {
-			log.error(String.format("Could not shutdown domain %d.", domainId), le);
-			throw new VirtException(String.format("Could not shutdown domain %d.", domainId), le);
-		}
-	}
+  /**
+   * Pause a running VM.
+   * 
+   * @param domainId
+   * @return
+   */
+  public void pause(Integer domainId) throws VirtException {
+    checkConnected();
+    try {
+      log.debug("Pausing domain {}.", domainId);
+      Domain d = connection.domainLookupByID(domainId);
+      d.suspend();
+    } catch (LibvirtException le) {
+      log.error(String.format("Could not pause domain %d.", domainId), le);
+      throw new VirtException(String.format("Could not pause domain %d.", domainId), le);
+    }
+  }
 
-	/**
-	 * Forcibly terminate a running VM.
-	 * @param domainId
-	 * @return
-	 */
-	public void destroy(Integer domainId) throws VirtException {
-		checkConnected();
-		try {
-			log.debug("Destroying domain {}.", domainId);
-			Domain d = connection.domainLookupByID(domainId);
-			d.destroy();
-		} catch (LibvirtException le) {
-			log.error(String.format("Could not destroy domain %d.", domainId), le);
-			throw new VirtException(String.format("Could not destroy domain %d.", domainId), le);
-		}
-	}
-	
-	/**
-	 * Retrieve a list of storage pools.
-	 * @return
-	 * @throws VirtException
-	 */
-	public List<InternalStoragePool> getStoragePools() throws VirtException {
-		checkConnected();
-		try {
-			List<InternalStoragePool> pools = new ArrayList<InternalStoragePool>();
-			for (String poolName : connection.listStoragePools()) {
-				final StoragePool pool = connection.storagePoolLookupByName(poolName);
-				pools.add(new InternalStoragePool(pool.getName(), pool.getUUIDString(), pool.numOfVolumes(), pool.getInfo().state, pool.getInfo().capacity, pool.getInfo().available, pool.getAutostart()));
-			}
-			return pools;
-		} catch (LibvirtException le) {
-			throw new VirtException("Could not retrieve list of storage pools.", le);
-		}
-	}
-	
-	/**
-	 * Retrieve a specific storage pool.
-	 * @param name
-	 * @return
-	 * @throws VirtException
-	 */
-	public InternalStoragePool getStoragePool(String name) throws VirtException {
-		checkConnected();
-		try {
-			final StoragePool pool = connection.storagePoolLookupByName(name);
-			return new InternalStoragePool(pool.getName(), pool.getUUIDString(), pool.numOfVolumes(), pool.getInfo().state, pool.getInfo().capacity, pool.getInfo().available, pool.getAutostart());
-		} catch (LibvirtException le) {
-			throw new VirtException("Could not retrieve storage pool.", le);
-		}
-	}
-	
-	/**
-	 * Retrieve all defined networks.
-	 * @return
-	 * @throws VirtException
-	 */
-	public List<String> getNetworks() throws VirtException {
-		checkConnected();
-		try {
-			return Arrays.asList(connection.listNetworks());
-		} catch (LibvirtException le) {
-			throw new VirtException("Could not retrieve list of networks.", le);
-		}
-	}
-	
-	/**
-	 * Retrieve a specific network.
-	 * @param name
-	 * @return
-	 * @throws VirtException
-	 */
-	public Network getNetwork(String name) throws VirtException {
-		checkConnected();
-		try {
-			return connection.networkLookupByName(name);
-		} catch (LibvirtException le) {
-			throw new VirtException("Could not retrieve network information.", le);
-		}
-	}
+  /**
+   * Send the ACPI shutdown command to a running VM.
+   * 
+   * @param domainId
+   * @return
+   */
+  public void shutdown(Integer domainId) throws VirtException {
+    checkConnected();
+    try {
+      log.debug("Shutting down domain {}.", domainId);
+      Domain d = connection.domainLookupByID(domainId);
+      d.shutdown();
+    } catch (LibvirtException le) {
+      log.error(String.format("Could not shutdown domain %d.", domainId), le);
+      throw new VirtException(String.format("Could not shutdown domain %d.", domainId), le);
+    }
+  }
+
+  /**
+   * Forcibly terminate a running VM.
+   * 
+   * @param domainId
+   * @return
+   */
+  public void destroy(Integer domainId) throws VirtException {
+    checkConnected();
+    try {
+      log.debug("Destroying domain {}.", domainId);
+      Domain d = connection.domainLookupByID(domainId);
+      d.destroy();
+    } catch (LibvirtException le) {
+      log.error(String.format("Could not destroy domain %d.", domainId), le);
+      throw new VirtException(String.format("Could not destroy domain %d.", domainId), le);
+    }
+  }
+
+  /**
+   * Retrieve a list of storage pools.
+   * 
+   * @return
+   * @throws VirtException
+   */
+  public List<InternalStoragePool> getStoragePools() throws VirtException {
+    checkConnected();
+    try {
+      List<InternalStoragePool> pools = new ArrayList<>();
+      for (String poolName : connection.listStoragePools()) {
+        final StoragePool pool = connection.storagePoolLookupByName(poolName);
+        pools.add(new InternalStoragePool(pool.getName(), pool.getUUIDString(), pool.numOfVolumes(), pool.getInfo().state, pool.getInfo().capacity, pool.getInfo().available, pool.getAutostart()));
+      }
+      return pools;
+    } catch (LibvirtException le) {
+      throw new VirtException("Could not retrieve list of storage pools.", le);
+    }
+  }
+
+  /**
+   * Retrieve a specific storage pool.
+   * 
+   * @param name
+   * @return
+   * @throws VirtException
+   */
+  public InternalStoragePool getStoragePool(String name) throws VirtException {
+    checkConnected();
+    try {
+      final StoragePool pool = connection.storagePoolLookupByName(name);
+      return new InternalStoragePool(pool.getName(), pool.getUUIDString(), pool.numOfVolumes(), pool.getInfo().state, pool.getInfo().capacity, pool.getInfo().available, pool.getAutostart());
+    } catch (LibvirtException le) {
+      throw new VirtException("Could not retrieve storage pool.", le);
+    }
+  }
+
+  /**
+   * Retrieve all defined networks.
+   * 
+   * @return
+   * @throws VirtException
+   */
+  public List<String> getNetworks() throws VirtException {
+    checkConnected();
+    try {
+      return Arrays.asList(connection.listNetworks());
+    } catch (LibvirtException le) {
+      throw new VirtException("Could not retrieve list of networks.", le);
+    }
+  }
+
+  /**
+   * Retrieve a specific network.
+   * 
+   * @param name
+   * @return
+   * @throws VirtException
+   */
+  public Network getNetwork(String name) throws VirtException {
+    checkConnected();
+    try {
+      return connection.networkLookupByName(name);
+    } catch (LibvirtException le) {
+      throw new VirtException("Could not retrieve network information.", le);
+    }
+  }
 }
