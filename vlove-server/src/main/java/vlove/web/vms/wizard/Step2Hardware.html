@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd" xml:lang="en" lang="en">
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<title>vlove</title>
+</head>
+<body>
+<wicket:panel>
+	<div>
+		<label>number of processors <span class="small">total available: <wicket:container wicket:id="totalProcs"></wicket:container></span></label>
+		<input type="text" wicket:id="numProcs" />
+	</div>
+	<div class="spacer"></div>
+	<div id="slider-procs" class="wizard-slider"></div>
+	<div>
+		<label>memory <span class="small">total available: <wicket:container wicket:id="totalMem"></wicket:container>M</span></label>
+		<input type="text" wicket:id="memSize" />
+	</div>
+	<div class="spacer"></div>
+	<div id="slider-memory" class="wizard-slider"></div>
+	<div>
+		<label>storage pool <span class="small">place to store the VM</span></label>
+		<select wicket:id="storagePool"></select>
+	</div>
+	<div class="spacer"></div>
+	<div wicket:id="storageContainer">
+		<div>
+			<label>disk <span class="small">total available: <wicket:container wicket:id="totalDisk"></wicket:container>G</span></label>
+			<input type="text" wicket:id="diskSize" />
+		</div>
+		<div class="spacer"></div>
+		<div id="slider-disk" class="wizard-slider"></div>
+	</div>
+	
+	<script type="text/javascript" wicket:id="jsVars"></script>
+	<script type="text/javascript">
+	$(function() {
+		$("#slider-procs").slider({
+			range: "max",
+			min: 1,
+			max: maxProcs,
+			value: 1,
+			slide: function(event, ui) {
+				$("#numProcs").val(ui.value);
+			}
+		});
+		$("#numProcs").val($("#slider-procs").slider("value"));
+	});
+	
+	$(function() {
+		$("#slider-memory").slider({
+			range: "max",
+			min: 1,
+			max: maxMem,
+			value: 256,
+			slide: function(event, ui) {
+				$("#memSize").val(ui.value);
+			}
+		});
+		$("#memSize").val($("#slider-memory").slider("value"));
+	});
+	
+	function renderDisk(maxDisk) {
+		var defDisk = 8;
+		if (defDisk > maxDisk) {
+			defDisk = maxDisk;
+		}
+		
+		$("#slider-disk").slider({
+			range: "max",
+			min: 1,
+			max: maxDisk,
+			value: defDisk,
+			slide: function(event, ui) {
+				$("#diskSize").val(ui.value);
+			}
+		});
+		$("#diskSize").val($("#slider-disk").slider("value"));
+	}
+	</script>
+	
+</wicket:panel>
+</body>
+</html>

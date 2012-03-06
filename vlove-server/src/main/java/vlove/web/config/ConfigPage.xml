@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="libvirtUrl.Required">libvirt URL is required</entry>
+	<entry key="vmbuilderLocation.Required">we need to know where to find the vmbuilder command</entry>
+</properties>
