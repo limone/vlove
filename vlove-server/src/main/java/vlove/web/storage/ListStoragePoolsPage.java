@@ -96,7 +96,6 @@ public class ListStoragePoolsPage extends BasePage {
       setObject(vm.getStoragePools());
     }
 
-    @SuppressWarnings("unused")
     public void reload() throws VirtException {
       setObject(virtMgr.getStoragePools());
     }

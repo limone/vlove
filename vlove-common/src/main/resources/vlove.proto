@@ -1,0 +1,16 @@
+package vlove;
+
+option java_package = "vlove.protobuf";
+option java_outer_classname = "VloveProtoMessage";
+
+message Vlove {
+  enum Operation {
+    LIST = 0;
+    CREATE = 1;
+    UPDATE = 2;
+    DELETE = 3;
+  }
+
+  required int32 id = 1;
+  required Operation op = 2;
+}
