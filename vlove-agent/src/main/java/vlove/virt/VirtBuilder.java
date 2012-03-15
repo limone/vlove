@@ -101,7 +101,7 @@ public class VirtBuilder {
       PipedInputStream pIs = new PipedInputStream(pOut);
 
       List<ConsumerListener> listeners = new ArrayList<>();
-      // listeners.add(new ConsumerListener(pOut, Pattern.compile("\\[sudo\\] password for \\w+:"), cd.getConfigItem("sudoPassword").getValue()));
+      listeners.add(new ConsumerListener(pOut, Pattern.compile("\\[sudo\\] password for \\w+:"), "password"));
 
       NestedStreamConsumer nOut = new NestedStreamConsumer(listeners, out);
       return CommandLineUtils.executeCommandLine(cs, pIs, nOut, err);

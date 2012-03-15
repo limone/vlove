@@ -11,12 +11,11 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.libvirt.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import vlove.VirtException;
-import vlove.virt.VirtManager;
+import vlove.service.VirtManager;
 
 public class Step3Network extends WizardStep {
   transient final Logger log = LoggerFactory.getLogger(getClass());
@@ -63,8 +62,8 @@ public class Step3Network extends WizardStep {
             target.add(bridgeCont.setVisible(true));
           } else {
             target.add(bridgeCont.setVisible(false));
-            Network n = vm.getNetwork(network);
-            log.debug("Bridge name: {}", n.getBridgeName());
+            String bridgeName = vm.getNetwork(network);
+            log.debug("Bridge name: {}", bridgeName);
           }
         } catch (Exception ex) {
           log.error("Could not process selected network.", ex);

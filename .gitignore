@@ -5,3 +5,4 @@
 target/
 *.h2.*
 MANIFEST.MF
+rebel.xml

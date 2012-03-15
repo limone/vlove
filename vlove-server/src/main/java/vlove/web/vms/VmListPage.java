@@ -30,15 +30,15 @@ import org.apache.wicket.request.resource.ContextRelativeResource;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.string.StringValue;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.libvirt.DomainInfo.DomainState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.annotation.mount.MountPath;
 
 import vlove.VirtException;
+import vlove.model.DomainState;
 import vlove.model.InternalDomain;
 import vlove.model.Pair;
-import vlove.virt.VirtManager;
+import vlove.service.VirtManager;
 import vlove.web.BasePage;
 import vlove.web.error.ErrorPage;
 

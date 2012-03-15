@@ -16,7 +16,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 import vlove.dao.ConfigDao;
 import vlove.model.ConfigForm;
 import vlove.model.ConfigItem;
-import vlove.virt.VirtManager;
+import vlove.service.VirtManager;
 import vlove.web.BasePage;
 import vlove.web.wicket.FormValidatorVisitor;
 import vlove.web.wicket.OutputMarkupIdAlwaysVisitor;
@@ -88,8 +88,6 @@ public class ConfigPage extends BasePage {
           sp.setValue(configModel.getSudoPassword());
           cd.saveConfigItem(sp);
         }
-
-        vm.connect(true);
       }
 
       @Override

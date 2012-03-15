@@ -9,7 +9,10 @@
       <pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %p [%c] %m%n</pattern>
     </encoder>
   </appender>
-  <logger name="vlove" additivity="false" level="DEBUG">
+  <logger name="vlove" additivity="false" level="TRACE">
+    <appender-ref ref="stdout"/>
+  </logger>
+  <logger name="org.atmosphere" additivity="false" level="TRACE">
     <appender-ref ref="stdout"/>
   </logger>
   <logger name="org.springframework" additivity="false" level="WARN">

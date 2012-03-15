@@ -20,8 +20,6 @@ package vlove.model;
 
 import java.io.Serializable;
 
-import org.libvirt.DomainInfo.DomainState;
-
 /**
  * The internal representation of a libvirt Domain object.
  * 

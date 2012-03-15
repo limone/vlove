@@ -37,7 +37,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import vlove.virt.VirtManager;
+import vlove.service.VirtManager;
+import vlove.web.agent.AgentPage;
 import vlove.web.config.ConfigPage;
 import vlove.web.storage.ListStoragePoolsPage;
 import vlove.web.vms.VmListPage;
@@ -54,7 +55,7 @@ public abstract class BasePage extends WebPage {
   VirtManager  vm;
 
   private enum Links {
-    HOME("home", HomePage.class), VMS("vms", VmListPage.class), STORAGE("storage", ListStoragePoolsPage.class), CONFIG("config", ConfigPage.class);
+    HOME("home", HomePage.class), AGENTS("agents", AgentPage.class), VMS("vms", VmListPage.class), STORAGE("storage", ListStoragePoolsPage.class), CONFIG("config", ConfigPage.class);
 
     private String                    name;
     private Class<? extends BasePage> impl;
@@ -73,7 +74,7 @@ public abstract class BasePage extends WebPage {
     }
   }
 
-  private static final Links[] links = new Links[] { Links.HOME, Links.VMS, Links.STORAGE, Links.CONFIG };
+  private static final Links[] links = new Links[] { Links.HOME, Links.AGENTS, Links.VMS, Links.STORAGE, Links.CONFIG };
 
   public BasePage() {
     WebMarkupContainer missingConfig = null;
@@ -86,11 +87,6 @@ public abstract class BasePage extends WebPage {
       // log.debug("Config is okay/we're the config page, keeping things blank");
       missingConfig = new WebMarkupContainer("config");
       missingConfig.setVisible(false);
-
-      // And since all is well, let us connect
-      if (!vm.isConnected()) {
-        vm.connect();
-      }
     }
     add(missingConfig);
 

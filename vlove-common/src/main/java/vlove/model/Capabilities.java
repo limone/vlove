@@ -21,45 +21,57 @@ package vlove.model;
 import java.io.Serializable;
 
 /**
- * POJO representing the hardware capabilities of the machine that libvirt is running on.
+ * POJO representing the hardware capabilities of the machine that libvirt is
+ * running on.
  * 
  * @author Michael Laccetti
  */
 public class Capabilities implements Serializable {
-	private String cpuArch;
-	private String model;
-	private String vendor;
-	private Integer numProcs;
+  private String  cpuArch;
+  private String  model;
+  private String  vendor;
+  private Integer numProcs;
 
-	public String getCpuArch() {
-		return cpuArch;
-	}
+  public Capabilities() {
+    // empty
+  }
 
-	public void setCpuArch(String cpuArch) {
-		this.cpuArch = cpuArch;
-	}
+  public Capabilities(String cpuArch, String model, String vendor, Integer numProcs) {
+    this.cpuArch = cpuArch;
+    this.model = model;
+    this.vendor = vendor;
+    this.numProcs = numProcs;
+  }
 
-	public String getModel() {
-		return model;
-	}
+  public String getCpuArch() {
+    return cpuArch;
+  }
 
-	public void setModel(String model) {
-		this.model = model;
-	}
+  public void setCpuArch(String cpuArch) {
+    this.cpuArch = cpuArch;
+  }
 
-	public String getVendor() {
-		return vendor;
-	}
+  public String getModel() {
+    return model;
+  }
 
-	public void setVendor(String vendor) {
-		this.vendor = vendor;
-	}
+  public void setModel(String model) {
+    this.model = model;
+  }
 
-	public Integer getNumProcs() {
-		return numProcs;
-	}
+  public String getVendor() {
+    return vendor;
+  }
 
-	public void setNumProcs(Integer numProcs) {
-		this.numProcs = numProcs;
-	}
+  public void setVendor(String vendor) {
+    this.vendor = vendor;
+  }
+
+  public Integer getNumProcs() {
+    return numProcs;
+  }
+
+  public void setNumProcs(Integer numProcs) {
+    this.numProcs = numProcs;
+  }
 }

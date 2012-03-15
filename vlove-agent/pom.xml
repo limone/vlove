@@ -25,6 +25,20 @@
       <artifactId>plexus-utils</artifactId>
       <version>2.0.5</version>
     </dependency>
+    
+    <!-- libvirt -->
+    <dependency>
+      <groupId>org.libvirt</groupId>
+      <artifactId>libvirt</artifactId>
+      <version>0.4.7</version>
+    </dependency>
+
+    <!-- jna -->
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>3.4.0</version>
+    </dependency>
 
     <!-- testing -->
     <dependency>

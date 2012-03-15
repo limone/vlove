@@ -18,8 +18,6 @@
  */
 package vlove.model;
 
-import org.libvirt.DomainInfo.DomainState;
-
 /**
  * Class that allows us to convert from libvirt DomainState to a String
  * representation.

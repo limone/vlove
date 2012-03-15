@@ -36,17 +36,16 @@ import org.libvirt.Network;
 import org.libvirt.StoragePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import vlove.VirtException;
-import vlove.dao.ConfigDao;
 import vlove.model.Capabilities;
-import vlove.model.ConfigItem;
+import vlove.model.DomainState;
 import vlove.model.InternalDomain;
 import vlove.model.InternalStoragePool;
+import vlove.model.StoragePoolState;
 import vlove.util.XPathUtils;
 
 import com.sun.management.OperatingSystemMXBean;
@@ -61,9 +60,6 @@ import com.sun.management.OperatingSystemMXBean;
 public class VirtManager implements Serializable {
   private static final Logger log         = LoggerFactory.getLogger(VirtManager.class);
   private boolean                isConnected = false;
-
-  @Autowired
-  private ConfigDao              cd;
 
   // Connection information
   private String                 libvirtUrl;
@@ -108,7 +104,7 @@ public class VirtManager implements Serializable {
     }
 
     // Set the default URL
-    libvirtUrl = cd.getConfigItem("libvirt.url").getValue();
+    libvirtUrl = "qemu:///session";
     if (libvirtUrl == null || libvirtUrl.length() == 0) {
       log.warn("No libvirt URL defined, setting to default: test:///default");
       libvirtUrl = "test:///default";
@@ -122,7 +118,6 @@ public class VirtManager implements Serializable {
    *          URL for libvirt
    */
   public void init(String newLibvirtUrl) {
-    cd.saveConfigItem(new ConfigItem("libvirt.url", newLibvirtUrl));
     init();
   }
 
@@ -141,35 +136,6 @@ public class VirtManager implements Serializable {
    */
   public boolean isConnected() {
     return isConnected;
-  }
-
-  /**
-   * Check to make sure that all of the configuration variables have been set.
-   * 
-   * @return
-   */
-  public boolean validateConfig() {
-    // log.debug("Validating config.");
-    if (cd.getConfigItem("libvirt.url").getValue() == null || cd.getConfigItem("vmbuilder.location").getValue() == null) {
-      log.warn("One of the configuration options was missing.");
-      return false;
-    }
-    // log.debug("Configuration was fine.");
-    return true;
-  }
-
-  /**
-   * Connect to libvirt
-   * 
-   * @param restart
-   *          If true, reload the libvirt URL from the configuration system.
-   * @return
-   */
-  public boolean connect(boolean restart) {
-    if (restart) {
-      libvirtUrl = cd.getConfigItem("libvirt.url").getValue();
-    }
-    return connect();
   }
 
   /**
@@ -253,12 +219,12 @@ public class VirtManager implements Serializable {
       List<InternalDomain> domains = new ArrayList<>();
       for (int did : connection.listDomains()) {
         Domain d = connection.domainLookupByID(did);
-        domains.add(new InternalDomain(did, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
+        domains.add(new InternalDomain(did, d.getUUIDString(), d.getName(), DomainState.valueOf(d.getInfo().state.toString()), osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
       }
 
       for (String domainName : connection.listDefinedDomains()) {
         Domain d = connection.domainLookupByName(domainName);
-        domains.add(new InternalDomain(0, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
+        domains.add(new InternalDomain(0, d.getUUIDString(), d.getName(), DomainState.valueOf(d.getInfo().state.toString()), osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory));
       }
       return domains;
     } catch (LibvirtException le) {
@@ -278,7 +244,7 @@ public class VirtManager implements Serializable {
     checkConnected();
     try {
       Domain d = connection.domainLookupByID(domainId);
-      return new InternalDomain(domainId, d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
+      return new InternalDomain(domainId, d.getUUIDString(), d.getName(), DomainState.valueOf(d.getInfo().state.toString()), osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
     } catch (LibvirtException le) {
       throw new VirtException(String.format("Could not retrieve domain for ID %d.", domainId));
     }
@@ -295,7 +261,7 @@ public class VirtManager implements Serializable {
     checkConnected();
     try {
       Domain d = connection.domainLookupByName(domainName);
-      return new InternalDomain(d.getID(), d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
+      return new InternalDomain(d.getID(), d.getUUIDString(), d.getName(), DomainState.valueOf(d.getInfo().state.toString()), osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
     } catch (LibvirtException le) {
       throw new VirtException(String.format("Could not retrieve domain for name %s.", domainName), le);
     }
@@ -311,7 +277,7 @@ public class VirtManager implements Serializable {
   public InternalDomain getDomainByUUID(String uuid) throws VirtException {
     try {
       Domain d = connection.domainLookupByUUIDString(uuid);
-      return new InternalDomain(d.getID(), d.getUUIDString(), d.getName(), d.getInfo().state, osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
+      return new InternalDomain(d.getID(), d.getUUIDString(), d.getName(), DomainState.valueOf(d.getInfo().state.toString()), osBean.getTotalPhysicalMemorySize(), d.getInfo().cpuTime, d.getInfo().memory);
     } catch (LibvirtException le) {
       throw new VirtException(String.format("Could not retrieve domain for UUID %s.", uuid));
     }
@@ -423,7 +389,7 @@ public class VirtManager implements Serializable {
       List<InternalStoragePool> pools = new ArrayList<>();
       for (String poolName : connection.listStoragePools()) {
         final StoragePool pool = connection.storagePoolLookupByName(poolName);
-        pools.add(new InternalStoragePool(pool.getName(), pool.getUUIDString(), pool.numOfVolumes(), pool.getInfo().state, pool.getInfo().capacity, pool.getInfo().available, pool.getAutostart()));
+        pools.add(new InternalStoragePool(pool.getName(), pool.getUUIDString(), pool.numOfVolumes(), StoragePoolState.valueOf(pool.getInfo().state.toString()), pool.getInfo().capacity, pool.getInfo().available, pool.getAutostart()));
       }
       return pools;
     } catch (LibvirtException le) {
@@ -442,7 +408,7 @@ public class VirtManager implements Serializable {
     checkConnected();
     try {
       final StoragePool pool = connection.storagePoolLookupByName(name);
-      return new InternalStoragePool(pool.getName(), pool.getUUIDString(), pool.numOfVolumes(), pool.getInfo().state, pool.getInfo().capacity, pool.getInfo().available, pool.getAutostart());
+      return new InternalStoragePool(pool.getName(), pool.getUUIDString(), pool.numOfVolumes(), StoragePoolState.valueOf(pool.getInfo().state.toString()), pool.getInfo().capacity, pool.getInfo().available, pool.getAutostart());
     } catch (LibvirtException le) {
       throw new VirtException("Could not retrieve storage pool.", le);
     }

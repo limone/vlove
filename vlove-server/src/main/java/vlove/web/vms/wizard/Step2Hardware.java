@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import vlove.VirtException;
 import vlove.model.InternalStoragePool;
-import vlove.virt.VirtManager;
+import vlove.service.VirtManager;
 
 import com.sun.management.OperatingSystemMXBean;
 

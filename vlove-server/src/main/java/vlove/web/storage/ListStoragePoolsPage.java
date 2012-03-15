@@ -12,14 +12,14 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.resource.ContextRelativeResource;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.libvirt.StoragePoolInfo.StoragePoolState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.annotation.mount.MountPath;
 
 import vlove.VirtException;
 import vlove.model.InternalStoragePool;
-import vlove.virt.VirtManager;
+import vlove.model.StoragePoolState;
+import vlove.service.VirtManager;
 import vlove.web.BasePage;
 import vlove.web.error.ErrorPage;
 

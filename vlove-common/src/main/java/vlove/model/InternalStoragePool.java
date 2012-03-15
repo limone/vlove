@@ -2,8 +2,6 @@ package vlove.model;
 
 import java.io.Serializable;
 
-import org.libvirt.StoragePoolInfo.StoragePoolState;
-
 public class InternalStoragePool implements Serializable {
 	private String name;
 	private String uuid;
