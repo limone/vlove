@@ -18,6 +18,7 @@ public class PubSubBroadcaster extends JerseyBroadcaster {
     super(id, config);
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   protected void broadcast(final AtmosphereResource<?,?> r, final AtmosphereResourceEvent e) {
     if (!isSet.getAndSet(true)) {
