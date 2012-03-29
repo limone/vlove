@@ -34,6 +34,7 @@ import vlove.dao.GenericDao;
 
 @Repository
 @Transactional
+@SuppressWarnings("unchecked")
 public class GenericDaoImpl implements GenericDao {
   @PersistenceContext
   private EntityManager em;
