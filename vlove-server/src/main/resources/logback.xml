@@ -12,19 +12,22 @@
   <logger name="vlove" additivity="false" level="TRACE">
     <appender-ref ref="stdout"/>
   </logger>
-  <logger name="org.atmosphere" additivity="false" level="TRACE">
+  <logger name="vlove.spring.jpa.OptionalOpenEntityManagerInViewFilter" additivity="false" level="WARN">
+    <appender-ref ref="stdout"/>
+  </logger>
+  <logger name="org.hibernate" additivity="false" level="WARN">
     <appender-ref ref="stdout"/>
   </logger>
   <logger name="org.springframework" additivity="false" level="WARN">
     <appender-ref ref="stdout"/>
   </logger>
-  <logger name="vlove.spring.jpa.OptionalOpenEntityManagerInViewFilter" additivity="false" level="WARN">
-    <appender-ref ref="stdout"/>
-  </logger>
   <logger name="org.springframework.transaction" additivity="false" level="WARN">
     <appender-ref ref="stdout"/>
   </logger>
-  <root level="WARN">
+  <logger name="org.slf4j" additivity="false" level="WARN">
+    <appender-ref ref="stdout"/>
+  </logger>
+  <root level="TRACE">
     <appender-ref ref="stdout"/>
   </root>
 </configuration>

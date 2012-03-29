@@ -9,7 +9,7 @@
 
   <artifactId>vlove-common</artifactId>
   <name>vlove common</name>
-
+  
   <dependencies>
     <!-- hibernate -->
     <dependency>
@@ -18,11 +18,16 @@
       <version>4.1.0.Final</version>
     </dependency>
 
-    <!-- atmosphere -->
+    <!-- jackson -->
     <dependency>
-      <groupId>org.atmosphere</groupId>
-      <artifactId>atmosphere-spring</artifactId>
-      <version>0.8.6</version>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-jaxrs</artifactId>
+      <version>1.9.6</version>
     </dependency>
 
     <!-- testing -->

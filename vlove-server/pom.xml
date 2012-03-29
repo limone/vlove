@@ -68,21 +68,18 @@
       </exclusions>
     </dependency>
 
-    <!-- atmosphere -->
+    <!-- Atmosphere -->
     <dependency>
       <groupId>org.atmosphere</groupId>
-      <artifactId>atmosphere-jersey</artifactId>
-      <version>0.8.6</version>
+      <artifactId>atmosphere-runtime</artifactId>
+      <version>0.9.0.RC2</version>
     </dependency>
+
+    <!-- Async Client -->
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-      <version>2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-json</artifactId>
-      <version>1.9.1</version>
+      <groupId>com.ning</groupId>
+      <artifactId>async-http-client</artifactId>
+      <version>1.8.0-SNAPSHOT</version>
     </dependency>
 
     <!-- aspectj -->
