@@ -1,5 +1,7 @@
 package vlove.web.websocket;
 
+import java.util.UUID;
+
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.BroadcasterFactory;
@@ -11,31 +13,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Configurable;
 
 import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.IQueue;
-import com.hazelcast.core.ItemEvent;
-import com.hazelcast.core.ItemListener;
+import com.hazelcast.core.ITopic;
+import com.hazelcast.core.Message;
+import com.hazelcast.core.MessageListener;
 
 @Configurable
 public class VloveWebSocketHandler extends WebSocketHandler {
   protected static final Logger log = LoggerFactory.getLogger(VloveWebSocketHandler.class);
   
-  private final IQueue<String> messageQueue;
+  private final ITopic<String> messageQueue;
+  private static final String uuid = UUID.randomUUID().toString();
   private AtmosphereResource r;
   
   public VloveWebSocketHandler() {
-    messageQueue = Hazelcast.getDefaultInstance().getQueue("websocket-messaging");
-    messageQueue.addItemListener(new ItemListener<String>() {
+    messageQueue = Hazelcast.getDefaultInstance().getTopic("websocket-messaging");
+    messageQueue.addMessageListener(new MessageListener<String>() {
       @Override
-      public void itemRemoved(ItemEvent<String> item) {
-        // we don't care
+      public void onMessage(Message<String> message) {
+        log.debug("Sending message.");
+        VloveWebSocketHandler.this.broadcast(message.getMessageObject());
       }
-      
-      @Override
-      public void itemAdded(ItemEvent<String> item) {
-        log.debug("Broadcasting message.");
-        VloveWebSocketHandler.this.broadcast(item.getItem());
-      }
-    }, true);
+    });
   }
 
   @Override
@@ -62,6 +60,8 @@ public class VloveWebSocketHandler extends WebSocketHandler {
   public void broadcast(String message) {
     if (r != null) {
       r.getBroadcaster().broadcast(message);
+    } else {
+      log.warn("{} not connected, could not broadcast message.", uuid);
     }
   }
 
