@@ -26,7 +26,6 @@ import org.apache.wicket.util.time.Duration;
 import org.apache.wicket.util.watch.ModificationWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.wicketstuff.annotation.scan.AnnotatedMountScanner;
 
 /**
@@ -48,8 +47,6 @@ public class WicketApplication extends WebApplication {
    */
   @Override
   protected void init() {
-    SLF4JBridgeHandler.install();
-
     log.info("vlove coming alive.");
     super.init();
 
