@@ -44,7 +44,7 @@
     </init-param>
     <init-param>
       <param-name>org.atmosphere.websocket.WebSocketProtocol</param-name>
-      <param-value>vlove.web.websocket.VloveWebSocketProtocol</param-value>
+      <param-value>vlove.web.websocket.VloveWebSocketHandler</param-value>
     </init-param>
     <load-on-startup>0 </load-on-startup>
     <async-supported>true</async-supported>

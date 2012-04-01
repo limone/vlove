@@ -8,9 +8,35 @@ import org.atmosphere.websocket.WebSocketEventListenerAdapter;
 import org.atmosphere.websocket.WebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Configurable;
 
-public class VloveWebSocketProtocol extends WebSocketHandler {
-  private static final Logger log = LoggerFactory.getLogger(VloveWebSocketProtocol.class);
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.IQueue;
+import com.hazelcast.core.ItemEvent;
+import com.hazelcast.core.ItemListener;
+
+@Configurable
+public class VloveWebSocketHandler extends WebSocketHandler {
+  protected static final Logger log = LoggerFactory.getLogger(VloveWebSocketHandler.class);
+  
+  private final IQueue<String> messageQueue;
+  private AtmosphereResource r;
+  
+  public VloveWebSocketHandler() {
+    messageQueue = Hazelcast.getDefaultInstance().getQueue("websocket-messaging");
+    messageQueue.addItemListener(new ItemListener<String>() {
+      @Override
+      public void itemRemoved(ItemEvent<String> item) {
+        // we don't care
+      }
+      
+      @Override
+      public void itemAdded(ItemEvent<String> item) {
+        log.debug("Broadcasting message.");
+        VloveWebSocketHandler.this.broadcast(item.getItem());
+      }
+    }, true);
+  }
 
   @Override
   public void onTextMessage(WebSocket webSocket, String message) {
@@ -25,12 +51,18 @@ public class VloveWebSocketProtocol extends WebSocketHandler {
   @Override
   public void onOpen(WebSocket webSocket) {
     // Accept the handshake by suspending the response.
-    AtmosphereResource r = webSocket.resource();
+    r = webSocket.resource();
     // Create a Broadcaster based on the path
     Broadcaster b = lookupBroadcaster(r.getRequest().getPathInfo());
     r.setBroadcaster(b);
     r.addEventListener(new WebSocketEventListenerAdapter());
     r.suspend(-1);
+  }
+  
+  public void broadcast(String message) {
+    if (r != null) {
+      r.getBroadcaster().broadcast(message);
+    }
   }
 
   /**
@@ -39,7 +71,7 @@ public class VloveWebSocketProtocol extends WebSocketHandler {
    * @param pathInfo
    * @return the {@link Broadcaster} based on the request's path info.
    */
-  Broadcaster lookupBroadcaster(String pathInfo) {
+  private Broadcaster lookupBroadcaster(String pathInfo) {
     String[] decodedPath = pathInfo.split("/");
     Broadcaster b = BroadcasterFactory.getDefault().lookup(decodedPath[decodedPath.length - 1], true);
     return b;
