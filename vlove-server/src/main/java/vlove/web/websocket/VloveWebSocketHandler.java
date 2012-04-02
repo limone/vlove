@@ -48,6 +48,7 @@ public class VloveWebSocketHandler extends WebSocketHandler {
 
   @Override
   public void onOpen(WebSocket webSocket) {
+    log.debug("WebSocket agent connection established.");
     // Accept the handshake by suspending the response.
     r = webSocket.resource();
     // Create a Broadcaster based on the path
@@ -59,6 +60,7 @@ public class VloveWebSocketHandler extends WebSocketHandler {
   
   public void broadcast(String message) {
     if (r != null) {
+      log.debug("Sending message to agent.");
       r.getBroadcaster().broadcast(message);
     } else {
       log.warn("{} not connected, could not broadcast message.", uuid);

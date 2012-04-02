@@ -1,5 +1,6 @@
 package vlove.web.agent;
 
+import java.util.Date;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -23,7 +24,7 @@ public class AgentPage extends BasePage {
       public void onClick(AjaxRequestTarget target) {
         log.debug("Putting agent message on the topic.");
         final String randomId = UUID.randomUUID().toString();
-        Hazelcast.getDefaultInstance().getTopic("").publish("Agent message " + randomId);
+        Hazelcast.getDefaultInstance().getTopic("websocket-messaging").publish("Agent message " + randomId + " " + new Date().toString());
         final String jsFormattedString = StringEscapeUtils.escapeEcmaScript("Send agent(s) message: " + randomId);
         target.appendJavaScript(String.format("updateOutput('sentMessageContainer', '%s');", jsFormattedString));
       }
