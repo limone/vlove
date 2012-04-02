@@ -12,7 +12,7 @@ import com.hazelcast.core.IMap;
 
 public class TestHzInstance {
   protected static final Logger log = LoggerFactory.getLogger(TestHzInstance.class);
-  boolean exit = false;
+  // boolean exit = false;
   
   @Test
   public void testHazelCast() {
@@ -22,7 +22,7 @@ public class TestHzInstance {
     
     log.debug("Size of map: {}", m.size());
     
-    new Thread() {
+    /*new Thread() {
       @Override
       public void run() {
         while (true) {
@@ -52,6 +52,6 @@ public class TestHzInstance {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-    }
+    }*/
   }
 }
