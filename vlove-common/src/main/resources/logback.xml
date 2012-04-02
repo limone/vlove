@@ -24,10 +24,7 @@
   <logger name="org.springframework.transaction" additivity="false" level="WARN">
     <appender-ref ref="stdout"/>
   </logger>
-  <logger name="org.slf4j" additivity="false" level="WARN">
-    <appender-ref ref="stdout"/>
-  </logger>
-  <root level="TRACE">
+  <root level="WARN">
     <appender-ref ref="stdout"/>
   </root>
 </configuration>

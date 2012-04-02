@@ -1,5 +1,7 @@
 package vlove.web.websocket;
 
+import java.util.UUID;
+
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.BroadcasterFactory;
@@ -8,9 +10,31 @@ import org.atmosphere.websocket.WebSocketEventListenerAdapter;
 import org.atmosphere.websocket.WebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Configurable;
 
-public class VloveWebSocketProtocol extends WebSocketHandler {
-  private static final Logger log = LoggerFactory.getLogger(VloveWebSocketProtocol.class);
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.ITopic;
+import com.hazelcast.core.Message;
+import com.hazelcast.core.MessageListener;
+
+@Configurable
+public class VloveWebSocketHandler extends WebSocketHandler {
+  protected static final Logger log = LoggerFactory.getLogger(VloveWebSocketHandler.class);
+  
+  private final ITopic<String> messageQueue;
+  private static final String uuid = UUID.randomUUID().toString();
+  private AtmosphereResource r;
+  
+  public VloveWebSocketHandler() {
+    messageQueue = Hazelcast.getDefaultInstance().getTopic("websocket-messaging");
+    messageQueue.addMessageListener(new MessageListener<String>() {
+      @Override
+      public void onMessage(Message<String> message) {
+        log.debug("Sending message.");
+        VloveWebSocketHandler.this.broadcast(message.getMessageObject());
+      }
+    });
+  }
 
   @Override
   public void onTextMessage(WebSocket webSocket, String message) {
@@ -24,13 +48,23 @@ public class VloveWebSocketProtocol extends WebSocketHandler {
 
   @Override
   public void onOpen(WebSocket webSocket) {
+    log.debug("WebSocket agent connection established.");
     // Accept the handshake by suspending the response.
-    AtmosphereResource r = webSocket.resource();
+    r = webSocket.resource();
     // Create a Broadcaster based on the path
     Broadcaster b = lookupBroadcaster(r.getRequest().getPathInfo());
     r.setBroadcaster(b);
     r.addEventListener(new WebSocketEventListenerAdapter());
     r.suspend(-1);
+  }
+  
+  public void broadcast(String message) {
+    if (r != null) {
+      log.debug("Sending message to agent.");
+      r.getBroadcaster().broadcast(message);
+    } else {
+      log.warn("{} not connected, could not broadcast message.", uuid);
+    }
   }
 
   /**
@@ -39,7 +73,7 @@ public class VloveWebSocketProtocol extends WebSocketHandler {
    * @param pathInfo
    * @return the {@link Broadcaster} based on the request's path info.
    */
-  Broadcaster lookupBroadcaster(String pathInfo) {
+  private Broadcaster lookupBroadcaster(String pathInfo) {
     String[] decodedPath = pathInfo.split("/");
     Broadcaster b = BroadcasterFactory.getDefault().lookup(decodedPath[decodedPath.length - 1], true);
     return b;

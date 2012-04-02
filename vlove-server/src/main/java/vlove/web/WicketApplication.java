@@ -47,8 +47,6 @@ public class WicketApplication extends WebApplication {
    */
   @Override
   protected void init() {
-    // SLF4JBridgeHandler.install();
-
     log.info("vlove coming alive.");
     super.init();
 

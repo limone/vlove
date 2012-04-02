@@ -80,6 +80,6 @@ function clearError(id) {
 
 function updateOutput(id, data) {
   $('#' + id).html(function(index, oldHtml) {
-    $(this).html(oldHtml + '<br/>' + data);
+    $(this).html(data);
   });
 }
