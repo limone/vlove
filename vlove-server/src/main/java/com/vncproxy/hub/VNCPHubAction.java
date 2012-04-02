@@ -7,7 +7,7 @@
  * through an HTTP AES encrypted tunnel.
  * As it is full HTTP, there is no proxy or firewall setup needed.
  * <p>
- * Copyright (C) 2009  - Rémi Serrano - http://www.vncproxy.com
+ * Copyright (C) 2009  - Remi Serrano - http://www.vncproxy.com
  * <p>
  * VNCProxy is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ import com.vncproxy.applet.VNCPSession;
  * and execute all the ActionData sent from the VNCProxy Applet to the VNCProxy
  * Hub
  * 
- * @author Rémi Serrano
+ * @author Remi Serrano
  * 
  */
 public class VNCPHubAction extends HttpServlet {

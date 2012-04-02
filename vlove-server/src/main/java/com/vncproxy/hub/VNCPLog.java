@@ -7,7 +7,7 @@
  * through an HTTP AES encrypted tunnel.
  * As it is full HTTP, there is no proxy or firewall setup needed.
  * <p>
- * Copyright (C) 2009  - Rémi Serrano - http://www.vncproxy.com
+ * Copyright (C) 2009  - Remi Serrano - http://www.vncproxy.com
  * <p>
  * VNCProxy is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ import java.util.TimeZone;
  * logger that manages 2 log level (info, error) and format the messages to log
  * by adding the GMTDate.
  * 
- * @author Rémi Serrano
+ * @author Remi Serrano
  * 
  */
 public class VNCPLog {
@@ -86,5 +86,4 @@ public class VNCPLog {
   private String gmtDate() {
     return sdf.format(new Date(System.currentTimeMillis())).toString();
   }
-
 }

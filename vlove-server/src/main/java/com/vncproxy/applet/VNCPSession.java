@@ -5,7 +5,7 @@
  * In just one clic (no setup) this Java Applet based solution allows you to run VNC Server / VNC Viewer through an HTTP AES encrypted tunnel.
  * As it is full HTTP, there is no proxy or firewall setup needed.
  * <p>
- * Copyright (C) 2009  - Rémi Serrano - http://www.vncproxy.com
+ * Copyright (C) 2009  - Remi Serrano - http://www.vncproxy.com
  * <p>
  * VNCProxy is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ package com.vncproxy.applet;
 /**
  * This class implements the VNCPSession object.
  * 
- * @author Rémi Serrano
+ * @author Remi Serrano
  * 
  */
 public class VNCPSession implements java.io.Serializable {
