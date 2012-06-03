@@ -38,12 +38,14 @@ public class VloveWebSocketHandler extends WebSocketHandler {
 
   @Override
   public void onTextMessage(WebSocket webSocket, String message) {
-    AtmosphereResource r = webSocket.resource();
+    log.debug("Received a message from an agent: {}", message);
+    
+    /*AtmosphereResource r = webSocket.resource();
     Broadcaster b = lookupBroadcaster(r.getRequest().getPathInfo());
 
     if (message != null && message.indexOf("message") != -1) {
       b.broadcast(message.substring("message=".length()));
-    }
+    }*/
   }
 
   @Override
