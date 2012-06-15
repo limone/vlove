@@ -30,6 +30,9 @@ public class Main {
         if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit")) {
           client.disconnect();
           break;
+        } else if (line.equals("reconnect")) {
+          client.disconnect();
+          client.connect();
         }
       }
     } catch (Exception ex) {

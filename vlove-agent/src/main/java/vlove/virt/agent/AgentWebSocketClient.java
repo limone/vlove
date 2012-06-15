@@ -24,7 +24,7 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
 public class AgentWebSocketClient implements AgentSocketCallback {
   protected static final Logger log = LoggerFactory.getLogger(AgentWebSocketClient.class);
 
-  private final AsyncHttpClient c = new AsyncHttpClient();
+  private AsyncHttpClient c;
   private final ObjectMapper om = new ObjectMapper();
   private WebSocket websocket;
 
@@ -39,6 +39,11 @@ public class AgentWebSocketClient implements AgentSocketCallback {
 
   public void connect() {
     try {
+      if (c != null && !c.isClosed()) {
+        disconnect();
+      }
+      
+      c = new AsyncHttpClient();
       c.prepareGet("ws://localhost:8080/vlove/s/agent").execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(new AgentWebSocketListener(this, reader)).build()).get();
     } catch (Exception ex) {
       try {
@@ -62,6 +67,7 @@ public class AgentWebSocketClient implements AgentSocketCallback {
       }
       c.close();
     }
+    uuid = null;
   }
 
   @Override

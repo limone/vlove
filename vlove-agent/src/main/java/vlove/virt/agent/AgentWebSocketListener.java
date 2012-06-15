@@ -10,6 +10,7 @@ import com.ning.http.client.websocket.WebSocketTextListener;
 public class AgentWebSocketListener implements WebSocketTextListener {
   private final AgentSocketCallback callback;
   private final ConsoleReader reader;
+  private final AgentWebSocketMessageHandler handler = new AgentWebSocketMessageHandler();
   
   public AgentWebSocketListener(AgentSocketCallback callback, ConsoleReader reader) {
     this.callback = callback;
@@ -22,6 +23,7 @@ public class AgentWebSocketListener implements WebSocketTextListener {
       reader.println("WebSocket connection established.");
       reader.flush();
       callback.onOpen(websocket);
+      handler.setWebSocket(websocket);
     } catch (IOException e) {
       // empty
     }
@@ -55,6 +57,7 @@ public class AgentWebSocketListener implements WebSocketTextListener {
     try {
       reader.println("Message from server: " + message);
       reader.flush();
+      handler.onMessage(message);
     } catch (IOException e) {
       // empty
     }

@@ -43,6 +43,11 @@ public class Capabilities implements Serializable {
     this.numProcs = numProcs;
   }
 
+  @Override
+  public String toString() {
+    return "Capabilities [cpuArch=" + cpuArch + ", model=" + model + ", vendor=" + vendor + ", numProcs=" + numProcs + "]";
+  }
+
   public String getCpuArch() {
     return cpuArch;
   }

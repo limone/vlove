@@ -40,24 +40,26 @@ public class VloveWebSocketHandler extends WebSocketHandler {
   public void onTextMessage(WebSocket webSocket, String message) {
     log.debug("Received a message from an agent: {}", message);
     
-    /*AtmosphereResource r = webSocket.resource();
-    Broadcaster b = lookupBroadcaster(r.getRequest().getPathInfo());
-
-    if (message != null && message.indexOf("message") != -1) {
-      b.broadcast(message.substring("message=".length()));
-    }*/
+    if (message.contains("\"messageType\":\"vlove.model.json.AgentConnectionMessage\"")) {
+      // Agent just connected
+      broadcast("Send your connection info, please.");
+    }
   }
 
   @Override
   public void onOpen(WebSocket webSocket) {
     log.debug("WebSocket agent connection established.");
+
     // Accept the handshake by suspending the response.
     r = webSocket.resource();
+
     // Create a Broadcaster based on the path
     Broadcaster b = lookupBroadcaster(r.getRequest().getPathInfo());
     r.setBroadcaster(b);
     r.addEventListener(new WebSocketEventListenerAdapter());
     r.suspend(-1);
+    
+    // broadcast()
   }
   
   public void broadcast(String message) {
