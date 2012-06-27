@@ -11,6 +11,7 @@ public class Main {
   private static Logger log = LoggerFactory.getLogger(Main.class);
 
   public static void main(String[] args) {
+    System.setProperty("jna.nosys", "true");
     try {
       Terminal t = TerminalFactory.get();
       t.init();
