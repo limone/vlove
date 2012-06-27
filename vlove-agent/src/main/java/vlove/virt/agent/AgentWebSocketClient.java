@@ -40,11 +40,13 @@ public class AgentWebSocketClient implements AgentSocketCallback {
   public void connect() {
     try {
       if (c != null && !c.isClosed()) {
+        log.debug("Already connected, so diconnecting first.");
         disconnect();
       }
       
       c = new AsyncHttpClient();
       c.prepareGet("ws://localhost:8080/vlove/s/agent").execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(new AgentWebSocketListener(this, reader)).build()).get();
+      log.debug("Agent connected to server.");
     } catch (Exception ex) {
       try {
         reader.println("Could not establish WebSocketConnection.  " + ex.getMessage());
@@ -56,6 +58,7 @@ public class AgentWebSocketClient implements AgentSocketCallback {
   }
 
   public void disconnect() {
+    log.debug("Disconnecting from server.");
     wantsToClose = true;
     if (c != null && !c.isClosed()) {
       if (websocket != null && websocket.isOpen()) {
@@ -68,6 +71,7 @@ public class AgentWebSocketClient implements AgentSocketCallback {
       c.close();
     }
     uuid = null;
+    log.debug("Disconnected from server.");
   }
 
   @Override
@@ -91,7 +95,7 @@ public class AgentWebSocketClient implements AgentSocketCallback {
     } catch (IOException ie) {
       // ignore this
     }
-    connect();
+    // connect();
   }
 
   @Override

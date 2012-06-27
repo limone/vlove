@@ -10,6 +10,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class LoggingBridgeHandlerListener implements ServletContextListener {
   @Override
   public void contextInitialized(ServletContextEvent sce) {
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
     
     Logger log = LoggerFactory.getLogger(LoggingBridgeHandlerListener.class);

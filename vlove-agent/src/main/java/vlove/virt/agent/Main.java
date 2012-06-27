@@ -12,22 +12,20 @@ public class Main {
 
   public static void main(String[] args) {
     System.setProperty("jna.nosys", "true");
+
     try {
       Terminal t = TerminalFactory.get();
       t.init();
-      
+
       ConsoleReader reader = new ConsoleReader("vlove", System.in, System.out, t);
       reader.setPrompt("vlove> ");
-      
+
       AgentWebSocketClient client = new AgentWebSocketClient(reader);
       client.connect();
 
       String line;
-      // PrintWriter out = new PrintWriter(reader.getOutput());
 
       while ((line = reader.readLine()) != null) {
-        // If we input the special word then we will mask
-        // the next line.
         if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit")) {
           client.disconnect();
           break;

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.xml.xpath.XPathConstants;
 
@@ -36,7 +35,6 @@ import org.libvirt.Network;
 import org.libvirt.StoragePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -56,7 +54,6 @@ import com.sun.management.OperatingSystemMXBean;
  * @author Michael Laccetti
  */
 @SuppressWarnings("restriction")
-@Service
 public class VirtManager implements Serializable {
   private static final Logger log         = LoggerFactory.getLogger(VirtManager.class);
   private boolean                isConnected = false;
@@ -82,10 +79,9 @@ public class VirtManager implements Serializable {
   /**
    * Post-constructor init method - connects to libvirt.
    */
-  @PostConstruct
   public void init() {
-    System.setProperty("jna.library.path", "C:/Tools/dev/libvirt/bin");
-    System.setProperty("java.library.path", "C:/Tools/dev/libvirt/bin");
+    // System.setProperty("jna.library.path", "C:/Tools/dev/libvirt/bin");
+    // System.setProperty("java.library.path", "C:/Tools/dev/libvirt/bin");
     
     final String os = System.getProperty("os.name");
     log.debug("Loading driver for OS: {}", os);

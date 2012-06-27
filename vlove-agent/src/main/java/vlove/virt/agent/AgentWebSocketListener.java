@@ -1,16 +1,22 @@
 package vlove.virt.agent;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import jline.console.ConsoleReader;
+
+import org.springframework.stereotype.Component;
 
 import com.ning.http.client.websocket.WebSocket;
 import com.ning.http.client.websocket.WebSocketTextListener;
 
+@Component
 public class AgentWebSocketListener implements WebSocketTextListener {
   private final AgentSocketCallback callback;
   private final ConsoleReader reader;
-  private final AgentWebSocketMessageHandler handler = new AgentWebSocketMessageHandler();
+  
+  private AgentWebSocketMessageHandler handler = new AgentWebSocketMessageHandler();
   
   public AgentWebSocketListener(AgentSocketCallback callback, ConsoleReader reader) {
     this.callback = callback;
@@ -43,8 +49,11 @@ public class AgentWebSocketListener implements WebSocketTextListener {
   @Override
   public void onError(Throwable t) {
     try {
+      StringWriter sw = new StringWriter();
+      t.printStackTrace(new PrintWriter(sw));
+      
       reader.println("Error occured in WebSocket communication.  "
-          + t.getMessage());
+          + t.getMessage() + sw.toString());
       reader.flush();
       callback.onError();
     } catch (IOException e) {

@@ -15,6 +15,7 @@ public class AgentWebSocketMessageHandler {
   private WebSocket webSocket;
 
   public AgentWebSocketMessageHandler() {
+    vm.init();
     vm.connect();
   }
 
